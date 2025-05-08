@@ -38,6 +38,9 @@ const Navbar = () => {
             <Link to="/settings" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors">
               Settings
             </Link>
+            <Link to="/register" className="px-3 py-2 rounded-md text-sm font-medium text-green-600 hover:text-white hover:bg-green-600 border border-green-600 transition-colors">
+              Register
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -91,6 +94,9 @@ const Navbar = () => {
           </Link>
           <Link to="/settings" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
             Settings
+          </Link>
+          <Link to="/register" className="block px-3 py-2 rounded-md text-base font-medium text-green-600 hover:text-white hover:bg-green-600 border border-green-600">
+            Register
           </Link>
         </div>
       </div>

@@ -13,6 +13,7 @@ import Settings from "./pages/Settings";
 import Upload from "./pages/Upload";
 import Pickup from "./pages/Pickup";
 import Reward from "./pages/Reward";
+import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/upload" element={<Upload />} />
           <Route path="/pickup" element={<Pickup />} />
           <Route path="/reward" element={<Reward />} />
+          <Route path="/register" element={<Register />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
