@@ -18,10 +18,11 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
               <img 
-                src="/logo.png" 
+                src="/lovable-uploads/5276d929-dfba-4407-af1c-e34519b5a96f.png" 
                 alt="Trash2Cash Logo" 
-                className="h-10 w-auto"
+                className="h-10 w-auto mr-2"
               />
+              <span className="text-green-600 font-bold text-xl">Trash2Cash</span>
             </Link>
           </div>
           
