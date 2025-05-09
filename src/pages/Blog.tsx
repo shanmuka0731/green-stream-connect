@@ -47,52 +47,65 @@ const Blog = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900">Our Blog</h1>
-            <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-              Stay updated with the latest news, tips, and insights about waste management and sustainability
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {BlogPosts.map((post) => (
-              <Card key={post.id} className="overflow-hidden shadow-lg">
-                <div className="h-48 overflow-hidden">
-                  <img 
-                    src={post.imageUrl} 
-                    alt={post.title}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-                <CardHeader>
-                  <div className="flex justify-between items-center text-sm text-gray-500 mb-1">
-                    <span>{post.category}</span>
-                    <span>{post.date}</span>
-                  </div>
-                  <CardTitle className="text-xl">{post.title}</CardTitle>
-                  <CardDescription className="text-gray-600">By {post.author}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700">{post.excerpt}</p>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="hover:text-green-600 hover:border-green-600">
-                    Read More
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
-            <Button className="bg-green-600 hover:bg-green-700 text-white">
-              Load More Articles
-            </Button>
-          </div>
+      <div className="relative">
+        {/* Background image with overlay */}
+        <div className="absolute inset-0 z-0" 
+             style={{
+               backgroundImage: `url('/lovable-uploads/89fca08e-a189-4fcf-a95d-1b8324cf9641.png')`,
+               backgroundSize: 'cover',
+               backgroundPosition: 'center',
+               backgroundBlendMode: 'overlay',
+               backgroundColor: 'rgba(14, 18, 16, 0.7)'
+             }}>
         </div>
-      </main>
+        
+        <main className="relative z-10 flex-grow py-10 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12 bg-white/80 p-6 rounded-lg shadow-md">
+              <h1 className="text-4xl font-bold text-gray-900">Our Blog</h1>
+              <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
+                Stay updated with the latest news, tips, and insights about waste management and sustainability
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {BlogPosts.map((post) => (
+                <Card key={post.id} className="overflow-hidden shadow-lg bg-white/90">
+                  <div className="h-48 overflow-hidden">
+                    <img 
+                      src={post.imageUrl} 
+                      alt={post.title}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                  </div>
+                  <CardHeader>
+                    <div className="flex justify-between items-center text-sm text-gray-500 mb-1">
+                      <span>{post.category}</span>
+                      <span>{post.date}</span>
+                    </div>
+                    <CardTitle className="text-xl">{post.title}</CardTitle>
+                    <CardDescription className="text-gray-600">By {post.author}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-700">{post.excerpt}</p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="hover:text-green-600 hover:border-green-600">
+                      Read More
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+
+            <div className="mt-12 text-center">
+              <Button className="bg-green-600 hover:bg-green-700 text-white">
+                Load More Articles
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
       <Footer />
     </div>
   );

@@ -6,16 +6,15 @@ const Hero = () => {
   return (
     <div className="relative overflow-hidden flex justify-center items-center min-h-[80vh]">
       {/* Background image */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/lovable-uploads/cf20c708-c79c-4b2c-8316-1ff3f749c336.png"
-          alt="Eco City Background"
-          className="w-full h-full object-cover"
-        />
+      <div className="absolute inset-0 z-0" 
+           style={{
+             backgroundImage: `url('/lovable-uploads/cf20c708-c79c-4b2c-8316-1ff3f749c336.png')`,
+             backgroundSize: 'cover',
+             backgroundPosition: 'center',
+             backgroundBlendMode: 'overlay',
+             backgroundColor: 'rgba(14, 18, 16, 0.7)'
+           }}>
       </div>
-      
-      {/* Content overlay with slight transparency */}
-      <div className="absolute inset-0 bg-black/10 z-10"></div>
 
       <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
         <div className="text-center">
