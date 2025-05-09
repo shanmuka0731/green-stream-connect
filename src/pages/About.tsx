@@ -10,7 +10,7 @@ const About = () => {
         {/* Background image with overlay */}
         <div className="absolute inset-0 z-0" 
              style={{
-               backgroundImage: `url('/lovable-uploads/8f059aaa-f675-489a-915e-cabb300d149e.png')`,
+               backgroundImage: `url('/lovable-uploads/e857e4e1-cab4-4389-ba78-9ae9a6e3760f.png')`,
                backgroundSize: 'cover',
                backgroundPosition: 'center',
                backgroundBlendMode: 'overlay',

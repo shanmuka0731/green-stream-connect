@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 
 const Hero = () => {
   return (
-    <div className="relative overflow-hidden flex justify-center items-center min-h-[80vh]">
+    <div className="relative overflow-hidden flex justify-center items-center min-h-[100vh]">
       {/* Background image */}
       <div className="absolute inset-0 z-0" 
            style={{
-             backgroundImage: `url('/lovable-uploads/cf20c708-c79c-4b2c-8316-1ff3f749c336.png')`,
+             backgroundImage: `url('/lovable-uploads/9b5e39cf-e084-4d01-a6f0-9987a621d562.png')`,
              backgroundSize: 'cover',
              backgroundPosition: 'center',
              backgroundBlendMode: 'overlay',
