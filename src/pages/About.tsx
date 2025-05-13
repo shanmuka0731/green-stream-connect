@@ -7,9 +7,9 @@ const About = () => {
     <div className="min-h-screen flex flex-col relative">
       {/* Background image - moved to a lower z-index */}
       <div 
-        className="absolute inset-0 z-[-1] opacity-20" 
+        className="absolute inset-0 z-[-1] opacity-100" 
         style={{ 
-          backgroundImage: "url('/lovable-uploads/525c58f8-4f0d-4eb5-820b-06671ac23d8c.png')", 
+          backgroundImage: "url('/lovable-uploads/6f4548ee-dae0-42ac-9645-2b5e74d87e7f.png')", 
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat"
@@ -22,7 +22,7 @@ const About = () => {
       </div>
       
       <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-lg shadow-lg">
+        <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm p-8 rounded-lg shadow-lg">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">About Trash2Cash</h1>
           
           <div className="prose max-w-none">
@@ -85,4 +85,3 @@ const About = () => {
 };
 
 export default About;
-
