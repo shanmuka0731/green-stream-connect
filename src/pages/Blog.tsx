@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -102,6 +101,15 @@ const initialBlogPosts = [
     imageUrl: "https://images.unsplash.com/photo-1605600659236-3bdfb9befd68?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     content: `
       <p>Not all plastics are created equal, especially when it comes to recycling. Understanding the different types of plastic and their recyclability can help ensure your recycling efforts actually make a difference.</p>
+      
+      <div class="my-6">
+        <img 
+          src="https://images.unsplash.com/photo-1618477462146-aa33540c7fc4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" 
+          alt="Different types of plastic waste sorted for recycling" 
+          class="w-full rounded-lg shadow-md"
+        />
+        <p class="text-sm text-gray-500 mt-2 italic text-center">Various plastic types sorted for recycling, each with different properties and recyclability.</p>
+      </div>
       
       <h2>The Plastic Identification Code System</h2>
       <p>Most plastic products contain a number (1-7) inside a triangular recycling symbol. This Resin Identification Code indicates the type of plastic used and affects whether and how the item can be recycled.</p>
