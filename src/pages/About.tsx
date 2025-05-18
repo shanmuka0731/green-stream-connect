@@ -12,7 +12,9 @@ const About = () => {
           backgroundImage: "url('/lovable-uploads/6f4548ee-dae0-42ac-9645-2b5e74d87e7f.png')", 
           backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundRepeat: "no-repeat"
+          backgroundRepeat: "no-repeat",
+          backgroundBlendMode: "overlay",
+          backgroundColor: "rgba(14, 18, 16, 0.7)"
         }}
       ></div>
       
