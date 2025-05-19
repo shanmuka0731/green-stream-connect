@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { IndianRupee } from "lucide-react";
 
 const Account = () => {
   return (
@@ -136,7 +137,10 @@ const Account = () => {
                     <Card className="transition-colors hover:bg-white">
                       <CardHeader className="pb-2">
                         <CardDescription>Total Cash Earned</CardDescription>
-                        <CardTitle className="text-2xl text-green-600">$42.50</CardTitle>
+                        <CardTitle className="text-2xl text-green-600 flex items-center">
+                          <IndianRupee size={20} className="mr-1" />
+                          3,250.00
+                        </CardTitle>
                       </CardHeader>
                     </Card>
                     <Card className="transition-colors hover:bg-white">
@@ -167,10 +171,18 @@ const Account = () => {
                             {new Date(2025, 4, 5 - i * 3).toLocaleDateString()}
                           </p>
                         </div>
-                        <p className="font-bold text-green-600">
-                          {i === 0 ? "$5.00" :
-                           i === 1 ? "500 pts" :
-                           "$5.50"}
+                        <p className="font-bold text-green-600 flex items-center">
+                          {i === 0 ? (
+                            <>
+                              <IndianRupee size={16} className="mr-1" />
+                              375.00
+                            </>
+                          ) : i === 1 ? "500 pts" : (
+                            <>
+                              <IndianRupee size={16} className="mr-1" />
+                              412.50
+                            </>
+                          )}
                         </p>
                       </div>
                     ))}

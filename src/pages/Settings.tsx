@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -53,11 +52,12 @@ const Settings = () => {
                         <Label htmlFor="currency" className="text-base">Currency</Label>
                         <p className="text-sm text-gray-500">Currency used for rewards</p>
                       </div>
-                      <Select defaultValue="usd">
+                      <Select defaultValue="inr">
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="inr">INR (₹)</SelectItem>
                           <SelectItem value="usd">USD ($)</SelectItem>
                           <SelectItem value="eur">EUR (€)</SelectItem>
                           <SelectItem value="gbp">GBP (£)</SelectItem>
