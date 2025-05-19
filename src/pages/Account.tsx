@@ -37,8 +37,12 @@ const Account = () => {
               <TabsTrigger value="rewards">Rewards</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="profile" className="mt-6">
-              <Card>
+            <TabsContent 
+              value="profile" 
+              className="mt-6" 
+              style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}
+            >
+              <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Personal Information</CardTitle>
                   <CardDescription>Update your personal details here.</CardDescription>
@@ -73,8 +77,12 @@ const Account = () => {
               </Card>
             </TabsContent>
             
-            <TabsContent value="activity" className="mt-6">
-              <Card>
+            <TabsContent 
+              value="activity" 
+              className="mt-6" 
+              style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}
+            >
+              <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
                   <CardDescription>Your recent waste collection activities.</CardDescription>
@@ -113,27 +121,31 @@ const Account = () => {
               </Card>
             </TabsContent>
             
-            <TabsContent value="rewards" className="mt-6">
-              <Card>
+            <TabsContent 
+              value="rewards" 
+              className="mt-6" 
+              style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}
+            >
+              <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Your Rewards</CardTitle>
                   <CardDescription>Track your earnings and points.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <Card>
+                    <Card className="transition-colors hover:bg-white">
                       <CardHeader className="pb-2">
                         <CardDescription>Total Cash Earned</CardDescription>
                         <CardTitle className="text-2xl text-green-600">$42.50</CardTitle>
                       </CardHeader>
                     </Card>
-                    <Card>
+                    <Card className="transition-colors hover:bg-white">
                       <CardHeader className="pb-2">
                         <CardDescription>Eco-Score Points</CardDescription>
                         <CardTitle className="text-2xl text-green-600">3,250 pts</CardTitle>
                       </CardHeader>
                     </Card>
-                    <Card>
+                    <Card className="transition-colors hover:bg-white">
                       <CardHeader className="pb-2">
                         <CardDescription>E-Gift Cards Redeemed</CardDescription>
                         <CardTitle className="text-2xl text-green-600">3</CardTitle>
@@ -144,7 +156,7 @@ const Account = () => {
                   <h3 className="text-lg font-medium mb-4">Recent Rewards</h3>
                   <div className="space-y-4">
                     {Array.from({length: 3}).map((_, i) => (
-                      <div key={i} className="flex justify-between items-center p-4 border rounded-lg">
+                      <div key={i} className="flex justify-between items-center p-4 border rounded-lg transition-colors hover:bg-white">
                         <div>
                           <p className="font-medium">
                             {i === 0 ? "Cash Reward" :
