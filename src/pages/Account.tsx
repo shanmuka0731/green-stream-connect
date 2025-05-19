@@ -12,7 +12,7 @@ const Account = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50" style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}>
         <div className="max-w-6xl mx-auto">
           <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center space-x-4">

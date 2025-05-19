@@ -12,7 +12,7 @@ const Settings = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50" style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}>
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Settings</h1>
 
