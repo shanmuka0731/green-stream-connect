@@ -8,8 +8,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IndianRupee } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Account = () => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSaveChanges = () => {
+    setIsLoading(true);
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      setIsLoading(false);
+      // Show toast notification
+      toast({
+        title: "Success",
+        description: "Changes done successfully",
+      });
+    }, 1000);
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -22,7 +41,7 @@ const Account = () => {
                 <AvatarFallback>JD</AvatarFallback>
               </Avatar>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">John Doe</h1>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">John Doe</h1>
                 <p className="text-gray-500">john.doe@example.com</p>
               </div>
             </div>
@@ -73,7 +92,13 @@ const Account = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="bg-green-600 hover:bg-green-700 text-white">Save Changes</Button>
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={handleSaveChanges}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Saving..." : "Save Changes"}
+                  </Button>
                 </CardFooter>
               </Card>
             </TabsContent>

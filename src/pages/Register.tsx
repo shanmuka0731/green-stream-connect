@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -54,8 +55,8 @@ const Register = () => {
     // In a real app, this would save to a database
     setRegistrations([...registrations, data]);
     toast({
-      title: "Registration successful!",
-      description: "Your organization has been registered.",
+      title: "Success",
+      description: "Your organization has been registered successfully",
     });
     form.reset();
   };
@@ -65,7 +66,7 @@ const Register = () => {
       <Navbar />
       <main className="flex-grow py-12 bg-green-50/50" style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
+          <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] mb-8">
             Register Your Organization
           </h1>
           
@@ -176,7 +177,7 @@ const Register = () => {
           {/* Database display section */}
           <div className="space-y-10">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Recently Registered Organizations</h2>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] mb-4">Recently Registered Organizations</h2>
               {registrations.length > 0 ? (
                 <div className="bg-white rounded-lg shadow overflow-hidden">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -220,7 +221,7 @@ const Register = () => {
             </div>
             
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Recent Pickup Orders</h2>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] mb-4">Recent Pickup Orders</h2>
               <div className="bg-white rounded-lg shadow overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
