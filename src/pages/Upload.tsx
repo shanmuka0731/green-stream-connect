@@ -10,12 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Weight, AlertTriangle } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const Upload = () => {
   const [wasteType, setWasteType] = useState("");
   const [description, setDescription] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [image, setImage] = useState<string | null>(null);
   const [wasteWeight, setWasteWeight] = useState<number | null>(null);
   const [weightError, setWeightError] = useState(false);
@@ -31,7 +31,6 @@ const Upload = () => {
       reader.onload = (event) => {
         if (event.target?.result) {
           setImage(event.target.result as string);
-          analyzeWasteWeight();
         }
       };
       
@@ -39,41 +38,20 @@ const Upload = () => {
     }
   };
 
-  const analyzeWasteWeight = () => {
-    setIsAnalyzing(true);
-    setWasteWeight(null);
-    setWeightError(false);
+  const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    setWasteWeight(value);
     
-    // Improved weight analysis algorithm that better handles heavier items
-    setTimeout(() => {
-      // Enhanced weight estimation - increased base range for better accuracy with heavy items
-      // Now estimates between 8kg and 20kg with higher probability of heavier weights
-      const fileSize = image ? image.length : 0;
-      
-      // Use file size and attributes to better estimate weight
-      // This gives more weight to larger items and provides more accurate readings for dumbbells
-      const baseWeight = 10; // Minimum weight threshold
-      const variability = 5; // Weight range
-      
-      // Use file characteristics to influence the weight estimation
-      // For demonstration, we're using a more accurate algorithm that factors in the image complexity
-      const complexityFactor = Math.min(1, Math.max(0.5, fileSize / 1000000)); // Normalized by file size
-      const simulatedWeight = baseWeight + (variability * complexityFactor * Math.random());
-      
-      // Round to 1 decimal place
-      const finalWeight = Math.round(simulatedWeight * 10) / 10;
-      setWasteWeight(finalWeight);
-      setIsAnalyzing(false);
-      
-      if (finalWeight < 10) {
-        setWeightError(true);
-        toast({
-          title: "Weight below threshold",
-          description: "Waste weight must be more than 10 kg",
-          variant: "destructive",
-        });
-      }
-    }, 2000);
+    if (value < 10) {
+      setWeightError(true);
+      toast({
+        title: "Weight below threshold",
+        description: "Waste weight must be more than 10 kg",
+        variant: "destructive",
+      });
+    } else {
+      setWeightError(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -91,7 +69,7 @@ const Upload = () => {
     if (!wasteWeight) {
       toast({
         title: "Error",
-        description: "Please upload an image for weight analysis",
+        description: "Please enter the waste weight",
         variant: "destructive",
       });
       return;
@@ -166,7 +144,7 @@ const Upload = () => {
                   />
                 </div>
 
-                <div className={`border-2 border-dashed rounded-lg p-6 text-center ${image ? 'border-green-300' : 'border-gray-300'} ${weightError ? 'border-red-300' : ''}`}>
+                <div className={`border-2 border-dashed rounded-lg p-6 text-center ${image ? 'border-green-300' : 'border-gray-300'}`}>
                   {!image ? (
                     <div className="flex flex-col items-center">
                       <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -185,7 +163,7 @@ const Upload = () => {
                             accept="image/*"
                           />
                         </label>
-                        <p className="pl-1">for weight analysis</p>
+                        <p className="pl-1">of your waste</p>
                       </div>
                       <p className="text-xs text-gray-500 mt-2">
                         PNG, JPG, GIF up to 10MB
@@ -198,37 +176,12 @@ const Upload = () => {
                       </div>
                       
                       <div className="mt-4">
-                        {isAnalyzing ? (
-                          <div className="flex items-center justify-center space-x-2">
-                            <div className="w-4 h-4 rounded-full bg-green-500 animate-pulse"></div>
-                            <span className="text-sm font-medium">Analyzing waste weight...</span>
-                          </div>
-                        ) : (
-                          wasteWeight !== null && (
-                            <div className={`mt-2 flex items-center justify-center space-x-2 ${wasteWeight >= 10 ? 'text-green-600' : 'text-red-600'}`}>
-                              <Weight className="h-5 w-5" />
-                              <span className="text-lg font-medium">Estimated Weight: {wasteWeight.toFixed(1)} kg</span>
-                              
-                              {wasteWeight < 10 && (
-                                <div className="flex items-center ml-1 text-red-600">
-                                  <AlertTriangle className="h-4 w-4 mr-1" />
-                                  <span className="text-sm">Minimum 10 kg required</span>
-                                </div>
-                              )}
-                            </div>
-                          )
-                        )}
-                      </div>
-                      
-                      <div className="mt-4">
                         <Button
                           type="button"
                           variant="outline"
                           className="text-sm"
                           onClick={() => {
                             setImage(null);
-                            setWasteWeight(null);
-                            setWeightError(false);
                             if (fileInputRef.current) {
                               fileInputRef.current.value = '';
                             }
@@ -240,12 +193,34 @@ const Upload = () => {
                     </div>
                   )}
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="waste-weight" className="flex items-center gap-2">
+                    <Weight className="h-4 w-4" />
+                    Enter Waste Weight (kg)
+                  </Label>
+                  <Input
+                    id="waste-weight"
+                    type="number"
+                    placeholder="Enter weight in kg"
+                    min="0"
+                    step="0.1"
+                    className={weightError ? 'border-red-500' : ''}
+                    onChange={handleWeightChange}
+                  />
+                  {weightError && (
+                    <p className="text-red-500 text-sm flex items-center gap-1">
+                      <AlertTriangle className="h-4 w-4" />
+                      Minimum weight requirement: 10 kg
+                    </p>
+                  )}
+                </div>
               </CardContent>
               <CardFooter>
                 <Button 
                   type="submit" 
                   className="w-full bg-green-600 hover:bg-green-700"
-                  disabled={isUploading || isAnalyzing || !wasteWeight || wasteWeight < 10}
+                  disabled={isUploading || !wasteWeight || wasteWeight < 10}
                 >
                   {isUploading ? "Uploading..." : (wasteWeight && wasteWeight >= 10) ? "Upload Waste Details" : "Upload Once Weight Requirement Met"}
                 </Button>
