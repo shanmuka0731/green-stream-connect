@@ -98,7 +98,10 @@ const Upload = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ 
+      backgroundBlendMode: "overlay", 
+      backgroundColor: "rgba(14, 18, 16, 0.7)" 
+    }}>
       <Navbar />
       <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-3xl mx-auto">

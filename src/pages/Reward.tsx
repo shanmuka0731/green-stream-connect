@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Check } from "lucide-react";
 
 const Reward = () => {
@@ -42,7 +42,10 @@ const Reward = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ 
+      backgroundBlendMode: "overlay", 
+      backgroundColor: "rgba(14, 18, 16, 0.7)" 
+    }}>
       <Navbar />
       <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-3xl mx-auto">
@@ -83,7 +86,7 @@ const Reward = () => {
                         <div className="text-sm text-gray-500">Receive payment directly to your bank account</div>
                       </div>
                     </Label>
-                    <div className="text-green-600 font-bold">$5.00</div>
+                    <div className="text-green-600 font-bold">₹5.00</div>
                   </div>
                   
                   <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -105,7 +108,7 @@ const Reward = () => {
                         <div className="text-sm text-gray-500">Get a digital gift card from popular retailers</div>
                       </div>
                     </Label>
-                    <div className="text-green-600 font-bold">$5.50</div>
+                    <div className="text-green-600 font-bold">₹5.50</div>
                   </div>
                 </RadioGroup>
               </CardContent>
