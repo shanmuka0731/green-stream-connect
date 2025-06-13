@@ -1,3 +1,4 @@
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -8,30 +9,29 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+
 const Settings = () => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  
   const handleSaveChanges = () => {
     setIsLoading(true);
-
+    
     // Simulate API call delay
     setTimeout(() => {
       setIsLoading(false);
       // Show toast notification
       toast({
         title: "Success",
-        description: "Changes done successfully"
+        description: "Changes done successfully",
       });
     }, 1000);
   };
-  return <div className="min-h-screen flex flex-col">
+  
+  return (
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main style={{
-      backgroundBlendMode: 'overlay',
-      backgroundColor: 'rgba(14, 18, 16, 0.7)'
-    }} className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-900">
+      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50" style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}>
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] mb-6">Settings</h1>
 
@@ -96,7 +96,11 @@ const Settings = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveChanges} disabled={isLoading}>
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={handleSaveChanges}
+                    disabled={isLoading}
+                  >
                     {isLoading ? "Saving..." : "Save Changes"}
                   </Button>
                 </CardFooter>
@@ -157,7 +161,11 @@ const Settings = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveChanges} disabled={isLoading}>
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={handleSaveChanges}
+                    disabled={isLoading}
+                  >
                     {isLoading ? "Saving..." : "Save Preferences"}
                   </Button>
                 </CardFooter>
@@ -198,7 +206,11 @@ const Settings = () => {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col items-start space-y-2">
-                  <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveChanges} disabled={isLoading}>
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={handleSaveChanges}
+                    disabled={isLoading}
+                  >
                     {isLoading ? "Saving..." : "Save Settings"}
                   </Button>
                   <Button variant="link" className="text-red-600 p-0">Delete My Account</Button>
@@ -263,6 +275,8 @@ const Settings = () => {
         </div>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Settings;
