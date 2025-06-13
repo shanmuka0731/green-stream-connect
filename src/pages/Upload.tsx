@@ -9,8 +9,19 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Weight, AlertTriangle } from "lucide-react";
+import { Weight, AlertTriangle, IndianRupee } from "lucide-react";
 import { Input } from "@/components/ui/input";
+
+// Waste pricing per kg
+const WASTE_PRICES = {
+  plastic: 15,
+  paper: 8,
+  electronics: 25,
+  glass: 5,
+  metal: 30,
+  organic: 3,
+  other: 10
+} as const;
 
 const Upload = () => {
   const [wasteType, setWasteType] = useState("");
@@ -54,6 +65,12 @@ const Upload = () => {
     }
   };
 
+  const calculateEarnings = () => {
+    if (!wasteWeight || !wasteType || wasteWeight < 10) return 0;
+    const pricePerKg = WASTE_PRICES[wasteType as keyof typeof WASTE_PRICES] || 0;
+    return wasteWeight * pricePerKg;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -89,13 +106,16 @@ const Upload = () => {
     // Simulate upload process
     setTimeout(() => {
       setIsUploading(false);
+      const earnings = calculateEarnings();
       toast({
         title: "Success!",
-        description: "Waste information uploaded successfully",
+        description: `Waste information uploaded successfully. Estimated earnings: ₹${earnings.toFixed(2)}`,
       });
       navigate("/pickup");
     }, 1500);
   };
+
+  const earnings = calculateEarnings();
 
   return (
     <div className="min-h-screen flex flex-col" style={{ 
@@ -125,13 +145,13 @@ const Upload = () => {
                       <SelectValue placeholder="Select waste type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="plastic">Plastic</SelectItem>
-                      <SelectItem value="paper">Paper & Cardboard</SelectItem>
-                      <SelectItem value="electronics">Electronics</SelectItem>
-                      <SelectItem value="glass">Glass</SelectItem>
-                      <SelectItem value="metal">Metal</SelectItem>
-                      <SelectItem value="organic">Organic Waste</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="plastic">Plastic (₹{WASTE_PRICES.plastic}/kg)</SelectItem>
+                      <SelectItem value="paper">Paper & Cardboard (₹{WASTE_PRICES.paper}/kg)</SelectItem>
+                      <SelectItem value="electronics">Electronics (₹{WASTE_PRICES.electronics}/kg)</SelectItem>
+                      <SelectItem value="glass">Glass (₹{WASTE_PRICES.glass}/kg)</SelectItem>
+                      <SelectItem value="metal">Metal (₹{WASTE_PRICES.metal}/kg)</SelectItem>
+                      <SelectItem value="organic">Organic Waste (₹{WASTE_PRICES.organic}/kg)</SelectItem>
+                      <SelectItem value="other">Other (₹{WASTE_PRICES.other}/kg)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -218,6 +238,21 @@ const Upload = () => {
                     </p>
                   )}
                 </div>
+
+                {wasteWeight && wasteWeight >= 10 && wasteType && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-green-800 font-medium">Estimated Earnings:</span>
+                      <span className="text-green-600 font-bold text-xl flex items-center">
+                        <IndianRupee className="h-5 w-5 mr-1" />
+                        {earnings.toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="text-green-700 text-sm mt-1">
+                      {wasteWeight}kg × ₹{WASTE_PRICES[wasteType as keyof typeof WASTE_PRICES]}/kg
+                    </p>
+                  </div>
+                )}
               </CardContent>
               <CardFooter>
                 <Button 

@@ -18,7 +18,6 @@ interface UserProfile {
   full_name: string | null;
   username: string | null;
   phone_number: string | null;
-  address: string | null;
 }
 
 const Account = () => {
@@ -31,8 +30,7 @@ const Account = () => {
   const [formData, setFormData] = useState({
     full_name: '',
     username: '',
-    phone_number: '',
-    address: ''
+    phone_number: ''
   });
 
   // Redirect if not authenticated
@@ -55,7 +53,7 @@ const Account = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, username, phone_number, address')
+        .select('id, full_name, username, phone_number')
         .eq('id', user.id)
         .single();
 
@@ -69,8 +67,7 @@ const Account = () => {
         setFormData({
           full_name: data.full_name || '',
           username: data.username || '',
-          phone_number: data.phone_number || '',
-          address: data.address || ''
+          phone_number: data.phone_number || ''
         });
       }
     } catch (error) {
@@ -209,15 +206,6 @@ const Account = () => {
                       id="phone" 
                       value={formData.phone_number}
                       onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
-                      disabled={!editMode}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Address</Label>
-                    <Input 
-                      id="address" 
-                      value={formData.address}
-                      onChange={(e) => setFormData({...formData, address: e.target.value})}
                       disabled={!editMode}
                     />
                   </div>

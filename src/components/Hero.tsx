@@ -1,11 +1,14 @@
 
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
+  const { user } = useAuth();
+
   return (
-    <div className="relative overflow-hidden flex justify-center items-center min-h-[100vh]">
-      {/* Background image */}
+    <section className="relative min-h-[80vh] flex items-center justify-center">
+      {/* Background Image with Dark Overlay */}
       <div className="absolute inset-0 z-0" 
            style={{
              backgroundImage: `url('/lovable-uploads/9b5e39cf-e084-4d01-a6f0-9987a621d562.png')`,
@@ -15,25 +18,36 @@ const Hero = () => {
              backgroundColor: 'rgba(14, 18, 16, 0.7)'
            }}>
       </div>
-
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
-        <div className="text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white max-w-3xl mx-auto drop-shadow-lg">
-            Join the <span className="green-metallic-text">Green Movement</span>
-          </h1>
-          <p className="mt-6 max-w-2xl mx-auto text-xl text-white drop-shadow-md">
-            Turn your trash into cash while helping save the planet. Connect with waste collection services and get rewarded for your eco-friendly actions.
-          </p>
-          <div className="mt-10">
-            <Link to="/auth">
-              <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg rounded-md shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
-                Get Started
-              </Button>
+      
+      {/* Content */}
+      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+          Turn Your Trash Into Cash
+        </h1>
+        <p className="text-xl md:text-2xl mb-8 text-gray-200 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+          Join the green revolution and earn rewards for recycling
+        </p>
+        <div className="space-x-4">
+          <Button 
+            size="lg" 
+            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+            asChild
+          >
+            <Link to={user ? "/upload" : "/auth"}>
+              Get Started
             </Link>
-          </div>
+          </Button>
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="bg-white/10 backdrop-blur-sm text-white border-white hover:bg-white hover:text-green-600 px-8 py-3 text-lg"
+            asChild
+          >
+            <Link to="/about">Learn More</Link>
+          </Button>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
