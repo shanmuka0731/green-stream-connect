@@ -3,12 +3,18 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   return (
@@ -37,15 +43,30 @@ const Navbar = () => {
             <Link to="/blog" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors">
               Blog
             </Link>
-            <Link to="/account" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors">
-              Account
-            </Link>
-            <Link to="/settings" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors">
-              Settings
-            </Link>
-            <Link to="/register" className="px-3 py-2 rounded-md text-sm font-medium text-green-600 hover:text-white hover:bg-green-600 border border-green-600 transition-colors">
-              Register
-            </Link>
+            {user ? (
+              <>
+                <Link to="/account" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors">
+                  Account
+                </Link>
+                <Link to="/settings" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors">
+                  Settings
+                </Link>
+                <Link to="/register" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 transition-colors">
+                  Register
+                </Link>
+                <Button
+                  onClick={handleSignOut}
+                  variant="outline"
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-green-600 border-gray-300 hover:border-green-600 transition-colors"
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth" className="px-3 py-2 rounded-md text-sm font-medium text-green-600 hover:text-white hover:bg-green-600 border border-green-600 transition-colors">
+                Login / Sign Up
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -94,15 +115,30 @@ const Navbar = () => {
           <Link to="/blog" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
             Blog
           </Link>
-          <Link to="/account" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
-            Account
-          </Link>
-          <Link to="/settings" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
-            Settings
-          </Link>
-          <Link to="/register" className="block px-3 py-2 rounded-md text-base font-medium text-green-600 hover:text-white hover:bg-green-600 border border-green-600">
-            Register
-          </Link>
+          {user ? (
+            <>
+              <Link to="/account" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+                Account
+              </Link>
+              <Link to="/settings" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+                Settings
+              </Link>
+              <Link to="/register" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50">
+                Register
+              </Link>
+              <Button
+                onClick={handleSignOut}
+                variant="ghost"
+                className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600 hover:bg-green-50"
+              >
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Link to="/auth" className="block px-3 py-2 rounded-md text-base font-medium text-green-600 hover:text-white hover:bg-green-600 border border-green-600">
+              Login / Sign Up
+            </Link>
+          )}
         </div>
       </div>
     </nav>

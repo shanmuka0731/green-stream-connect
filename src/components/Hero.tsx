@@ -25,7 +25,7 @@ const Hero = () => {
             Turn your trash into cash while helping save the planet. Connect with waste collection services and get rewarded for your eco-friendly actions.
           </p>
           <div className="mt-10">
-            <Link to="/upload">
+            <Link to="/auth">
               <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg rounded-md shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
                 Get Started
               </Button>

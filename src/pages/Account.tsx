@@ -1,4 +1,5 @@
-
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -8,26 +9,126 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IndianRupee } from "lucide-react";
-import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+
+interface UserProfile {
+  id: string;
+  full_name: string | null;
+  username: string | null;
+  phone_number: string | null;
+  address: string | null;
+}
 
 const Account = () => {
   const { toast } = useToast();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    username: '',
+    phone_number: '',
+    address: ''
+  });
 
-  const handleSaveChanges = () => {
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  // Load user profile
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+    }
+  }, [user]);
+
+  const loadProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading profile:', error);
+        return;
+      }
+
+      if (data) {
+        setProfile(data);
+        setFormData({
+          full_name: data.full_name || '',
+          username: data.username || '',
+          phone_number: data.phone_number || '',
+          address: data.address || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    if (!user) return;
+    
     setIsLoading(true);
     
-    // Simulate API call delay
-    setTimeout(() => {
-      setIsLoading(false);
-      // Show toast notification
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          ...formData
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      await loadProfile();
+      setEditMode(false);
+      
       toast({
         title: "Success",
-        description: "Changes done successfully",
+        description: "Profile updated successfully",
       });
-    }, 1000);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const userInitials = profile?.full_name 
+    ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase()
+    : user.email?.charAt(0).toUpperCase() || 'U';
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -37,16 +138,24 @@ const Account = () => {
           <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center space-x-4">
               <Avatar className="h-20 w-20">
-                <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarImage src="" alt="User" />
+                <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">John Doe</h1>
-                <p className="text-gray-500">john.doe@example.com</p>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+                  {profile?.full_name || 'User'}
+                </h1>
+                <p className="text-gray-500">{user.email}</p>
               </div>
             </div>
             <div className="mt-4 md:mt-0">
-              <Button variant="outline" className="bg-white">Edit Profile</Button>
+              <Button 
+                variant="outline" 
+                className="bg-white"
+                onClick={() => setEditMode(!editMode)}
+              >
+                {editMode ? 'Cancel Edit' : 'Edit Profile'}
+              </Button>
             </div>
           </div>
 
@@ -65,41 +174,65 @@ const Account = () => {
               <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Personal Information</CardTitle>
-                  <CardDescription>Update your personal details here.</CardDescription>
+                  <CardDescription>
+                    {editMode ? 'Update your personal details here.' : 'Your personal information.'}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="first-name">First name</Label>
-                      <Input id="first-name" defaultValue="John" />
+                      <Label htmlFor="full-name">Full name</Label>
+                      <Input 
+                        id="full-name" 
+                        value={formData.full_name}
+                        onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                        disabled={!editMode}
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="last-name">Last name</Label>
-                      <Input id="last-name" defaultValue="Doe" />
+                      <Label htmlFor="username">Username</Label>
+                      <Input 
+                        id="username" 
+                        value={formData.username}
+                        onChange={(e) => setFormData({...formData, username: e.target.value})}
+                        disabled={!editMode}
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" defaultValue="john.doe@example.com" />
+                    <Input id="email" value={user.email || ''} disabled />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone number</Label>
-                    <Input id="phone" defaultValue="+1 234 567 890" />
+                    <Input 
+                      id="phone" 
+                      value={formData.phone_number}
+                      onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
+                      disabled={!editMode}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="address">Address</Label>
-                    <Input id="address" defaultValue="123 Green Street, Eco City" />
+                    <Input 
+                      id="address" 
+                      value={formData.address}
+                      onChange={(e) => setFormData({...formData, address: e.target.value})}
+                      disabled={!editMode}
+                    />
                   </div>
                 </CardContent>
-                <CardFooter>
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                    onClick={handleSaveChanges}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Saving..." : "Save Changes"}
-                  </Button>
-                </CardFooter>
+                {editMode && (
+                  <CardFooter>
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      onClick={handleSaveChanges}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </CardFooter>
+                )}
               </Card>
             </TabsContent>
             
