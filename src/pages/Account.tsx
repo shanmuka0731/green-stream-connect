@@ -12,17 +12,20 @@ import { IndianRupee } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-
 interface UserProfile {
   id: string;
   full_name: string | null;
   username: string | null;
   phone_number: string | null;
 }
-
 const Account = () => {
-  const { toast } = useToast();
-  const { user, loading } = useAuth();
+  const {
+    toast
+  } = useToast();
+  const {
+    user,
+    loading
+  } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -46,22 +49,17 @@ const Account = () => {
       loadProfile();
     }
   }, [user]);
-
   const loadProfile = async () => {
     if (!user) return;
-
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, full_name, username, phone_number')
-        .eq('id', user.id)
-        .single();
-
+      const {
+        data,
+        error
+      } = await supabase.from('profiles').select('id, full_name, username, phone_number').eq('id', user.id).single();
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading profile:', error);
         return;
       }
-
       if (data) {
         setProfile(data);
         setFormData({
@@ -74,63 +72,51 @@ const Account = () => {
       console.error('Error loading profile:', error);
     }
   };
-
   const handleSaveChanges = async () => {
     if (!user) return;
-    
     setIsLoading(true);
-    
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          ...formData
-        });
-
+      const {
+        error
+      } = await supabase.from('profiles').upsert({
+        id: user.id,
+        ...formData
+      });
       if (error) {
         throw error;
       }
-
       await loadProfile();
       setEditMode(false);
-      
       toast({
         title: "Success",
-        description: "Profile updated successfully",
+        description: "Profile updated successfully"
       });
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
         title: "Error",
         description: "Failed to update profile",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">Loading...</div>
-      </div>
-    );
+      </div>;
   }
-
   if (!user) {
     return null;
   }
-
-  const userInitials = profile?.full_name 
-    ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase()
-    : user.email?.charAt(0).toUpperCase() || 'U';
-  
-  return (
-    <div className="min-h-screen flex flex-col">
+  const userInitials = profile?.full_name ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : user.email?.charAt(0).toUpperCase() || 'U';
+  return <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50" style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}>
+      <main style={{
+      backgroundBlendMode: 'overlay',
+      backgroundColor: 'rgba(14, 18, 16, 0.7)'
+    }} className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-900">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center space-x-4">
@@ -146,11 +132,7 @@ const Account = () => {
               </div>
             </div>
             <div className="mt-4 md:mt-0">
-              <Button 
-                variant="outline" 
-                className="bg-white"
-                onClick={() => setEditMode(!editMode)}
-              >
+              <Button variant="outline" className="bg-white" onClick={() => setEditMode(!editMode)}>
                 {editMode ? 'Cancel Edit' : 'Edit Profile'}
               </Button>
             </div>
@@ -163,11 +145,10 @@ const Account = () => {
               <TabsTrigger value="rewards">Rewards</TabsTrigger>
             </TabsList>
             
-            <TabsContent 
-              value="profile" 
-              className="mt-6" 
-              style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}
-            >
+            <TabsContent value="profile" className="mt-6" style={{
+            backgroundBlendMode: 'overlay',
+            backgroundColor: 'rgba(14, 18, 16, 0.7)'
+          }}>
               <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Personal Information</CardTitle>
@@ -179,21 +160,17 @@ const Account = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="full-name">Full name</Label>
-                      <Input 
-                        id="full-name" 
-                        value={formData.full_name}
-                        onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                        disabled={!editMode}
-                      />
+                      <Input id="full-name" value={formData.full_name} onChange={e => setFormData({
+                      ...formData,
+                      full_name: e.target.value
+                    })} disabled={!editMode} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="username">Username</Label>
-                      <Input 
-                        id="username" 
-                        value={formData.username}
-                        onChange={(e) => setFormData({...formData, username: e.target.value})}
-                        disabled={!editMode}
-                      />
+                      <Input id="username" value={formData.username} onChange={e => setFormData({
+                      ...formData,
+                      username: e.target.value
+                    })} disabled={!editMode} />
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -202,33 +179,24 @@ const Account = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone number</Label>
-                    <Input 
-                      id="phone" 
-                      value={formData.phone_number}
-                      onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
-                      disabled={!editMode}
-                    />
+                    <Input id="phone" value={formData.phone_number} onChange={e => setFormData({
+                    ...formData,
+                    phone_number: e.target.value
+                  })} disabled={!editMode} />
                   </div>
                 </CardContent>
-                {editMode && (
-                  <CardFooter>
-                    <Button 
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                      onClick={handleSaveChanges}
-                      disabled={isLoading}
-                    >
+                {editMode && <CardFooter>
+                    <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveChanges} disabled={isLoading}>
                       {isLoading ? "Saving..." : "Save Changes"}
                     </Button>
-                  </CardFooter>
-                )}
+                  </CardFooter>}
               </Card>
             </TabsContent>
             
-            <TabsContent 
-              value="activity" 
-              className="mt-6" 
-              style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}
-            >
+            <TabsContent value="activity" className="mt-6" style={{
+            backgroundBlendMode: 'overlay',
+            backgroundColor: 'rgba(14, 18, 16, 0.7)'
+          }}>
               <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
@@ -236,8 +204,9 @@ const Account = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {Array.from({length: 5}).map((_, i) => (
-                      <div key={i} className="border-b pb-4 last:border-0">
+                    {Array.from({
+                    length: 5
+                  }).map((_, i) => <div key={i} className="border-b pb-4 last:border-0">
                         <div className="flex justify-between items-start">
                           <div>
                             <p className="font-medium">
@@ -252,14 +221,9 @@ const Account = () => {
                           </span>
                         </div>
                         <p className="mt-2 text-sm text-gray-600">
-                          {i === 0 ? "3.2kg of recyclable waste" :
-                           i === 1 ? "2.5kg of paper and cardboard" :
-                           i === 2 ? "1 old laptop and 2 mobile phones" :
-                           i === 3 ? "5 glass bottles and containers" :
-                           "1.8kg of mixed recyclables"}
+                          {i === 0 ? "3.2kg of recyclable waste" : i === 1 ? "2.5kg of paper and cardboard" : i === 2 ? "1 old laptop and 2 mobile phones" : i === 3 ? "5 glass bottles and containers" : "1.8kg of mixed recyclables"}
                         </p>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -268,11 +232,10 @@ const Account = () => {
               </Card>
             </TabsContent>
             
-            <TabsContent 
-              value="rewards" 
-              className="mt-6" 
-              style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(14, 18, 16, 0.7)' }}
-            >
+            <TabsContent value="rewards" className="mt-6" style={{
+            backgroundBlendMode: 'overlay',
+            backgroundColor: 'rgba(14, 18, 16, 0.7)'
+          }}>
               <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Your Rewards</CardTitle>
@@ -305,33 +268,27 @@ const Account = () => {
                   
                   <h3 className="text-lg font-medium mb-4">Recent Rewards</h3>
                   <div className="space-y-4">
-                    {Array.from({length: 3}).map((_, i) => (
-                      <div key={i} className="flex justify-between items-center p-4 border rounded-lg transition-colors hover:bg-white">
+                    {Array.from({
+                    length: 3
+                  }).map((_, i) => <div key={i} className="flex justify-between items-center p-4 border rounded-lg transition-colors hover:bg-white">
                         <div>
                           <p className="font-medium">
-                            {i === 0 ? "Cash Reward" :
-                             i === 1 ? "Eco-Score Points" :
-                             "E-Gift Card (Amazon)"}
+                            {i === 0 ? "Cash Reward" : i === 1 ? "Eco-Score Points" : "E-Gift Card (Amazon)"}
                           </p>
                           <p className="text-sm text-gray-500">
                             {new Date(2025, 4, 5 - i * 3).toLocaleDateString()}
                           </p>
                         </div>
                         <p className="font-bold text-green-600 flex items-center">
-                          {i === 0 ? (
-                            <>
+                          {i === 0 ? <>
                               <IndianRupee size={16} className="mr-1" />
                               375.00
-                            </>
-                          ) : i === 1 ? "500 pts" : (
-                            <>
+                            </> : i === 1 ? "500 pts" : <>
                               <IndianRupee size={16} className="mr-1" />
                               412.50
-                            </>
-                          )}
+                            </>}
                         </p>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -343,8 +300,6 @@ const Account = () => {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Account;
