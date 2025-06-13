@@ -55,7 +55,7 @@ const Account = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, full_name, username, phone_number, address')
         .eq('id', user.id)
         .single();
 
