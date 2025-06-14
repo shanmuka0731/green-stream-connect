@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -8,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { IndianRupee, Award } from "lucide-react";
+import { IndianRupee, Award, Gift, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,7 @@ interface RewardData {
   cashReward: number;
   ecoPoints: number;
   weight: number;
+  selectedRewardType: string;
 }
 
 const Account = () => {
@@ -207,6 +209,62 @@ const Account = () => {
     ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase() 
     : user.email?.charAt(0).toUpperCase() || 'U';
 
+  const getRewardIcon = (rewardType: string) => {
+    switch (rewardType) {
+      case 'cash':
+        return <IndianRupee className="h-5 w-5" />;
+      case 'ecoscore':
+        return <Star className="h-5 w-5" />;
+      case 'egift':
+        return <Gift className="h-5 w-5" />;
+      default:
+        return <Award className="h-5 w-5" />;
+    }
+  };
+
+  const getRewardTitle = (rewardType: string) => {
+    switch (rewardType) {
+      case 'cash':
+        return 'Cash Reward';
+      case 'ecoscore':
+        return 'Eco-Score Points';
+      case 'egift':
+        return 'E-Gift Card';
+      default:
+        return 'Latest Upload Reward';
+    }
+  };
+
+  const getRewardValue = (rewardType: string, rewardData: RewardData) => {
+    switch (rewardType) {
+      case 'cash':
+        return (
+          <div className="text-2xl font-bold text-green-600 flex items-center justify-center">
+            <IndianRupee size={20} className="mr-1" />
+            {rewardData.cashReward.toFixed(2)}
+          </div>
+        );
+      case 'ecoscore':
+        return (
+          <div className="text-2xl font-bold text-green-600">
+            {rewardData.ecoPoints} pts
+          </div>
+        );
+      case 'egift':
+        return (
+          <div className="text-2xl font-bold text-green-600">
+            Gift Card
+          </div>
+        );
+      default:
+        return (
+          <div className="text-2xl font-bold text-green-600">
+            Reward
+          </div>
+        );
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -299,32 +357,27 @@ const Account = () => {
             
             <TabsContent value="rewards" className="mt-6">
               <div className="space-y-6">
-                {/* Latest Upload Reward */}
+                {/* Latest Upload Reward - Only show the selected reward type */}
                 {rewardData && (
                   <Card className="transition-colors hover:bg-white border-2 border-green-200 bg-green-50">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-green-700">
-                        <Award className="h-5 w-5" />
-                        Latest Upload Reward
+                        {getRewardIcon(rewardData.selectedRewardType)}
+                        {getRewardTitle(rewardData.selectedRewardType)}
                       </CardTitle>
                       <CardDescription>
-                        Your estimated reward from the most recent waste upload
+                        Your selected reward from the most recent waste upload
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="text-center p-4 bg-white rounded-lg border">
-                          <div className="text-2xl font-bold text-green-600 flex items-center justify-center">
-                            <IndianRupee size={20} className="mr-1" />
-                            {rewardData.cashReward.toFixed(2)}
+                          {getRewardValue(rewardData.selectedRewardType, rewardData)}
+                          <div className="text-sm text-gray-600 mt-1">
+                            {rewardData.selectedRewardType === 'cash' ? 'Cash Reward' : 
+                             rewardData.selectedRewardType === 'ecoscore' ? 'Eco Points' : 
+                             'Gift Card Value'}
                           </div>
-                          <div className="text-sm text-gray-600 mt-1">Cash Reward</div>
-                        </div>
-                        <div className="text-center p-4 bg-white rounded-lg border">
-                          <div className="text-2xl font-bold text-green-600">
-                            {rewardData.ecoPoints} pts
-                          </div>
-                          <div className="text-sm text-gray-600 mt-1">Eco Points</div>
                         </div>
                         <div className="text-center p-4 bg-white rounded-lg border">
                           <div className="text-2xl font-bold text-green-600">

@@ -43,6 +43,17 @@ const Reward = () => {
     setIsProcessing(true);
     
     try {
+      // Get existing reward data and update it with the selected reward type
+      const storedRewardData = localStorage.getItem('rewardData');
+      if (storedRewardData) {
+        const parsedData = JSON.parse(storedRewardData);
+        const updatedRewardData = {
+          ...parsedData,
+          selectedRewardType: selectedReward
+        };
+        localStorage.setItem('rewardData', JSON.stringify(updatedRewardData));
+      }
+
       toast({
         title: "Success!",
         description: `Pickup confirmed and ${selectedReward === 'ecoscore' ? 'eco-points' : selectedReward === 'egift' ? 'e-gift card' : 'cash reward'} selected`,
