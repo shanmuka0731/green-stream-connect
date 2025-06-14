@@ -29,14 +29,11 @@ const Hero = () => {
         <p className="text-xl md:text-2xl mb-8 text-gray-200 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
           Join the green revolution and earn rewards for recycling
         </p>
-        <div className="space-x-4">
+        <div>
           <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg" asChild>
             <Link to={user ? "/upload" : "/auth"}>
               Get Started
             </Link>
-          </Button>
-          <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm text-white border-white hover:bg-white hover:text-green-600 px-8 py-3 text-lg" asChild>
-            <Link to="/about">Learn More</Link>
           </Button>
         </div>
       </div>
