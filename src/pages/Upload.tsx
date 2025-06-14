@@ -14,8 +14,22 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
+interface WasteSubtypeData {
+  min: number;
+  max: number;
+  unit: string;
+}
+
+interface WasteTypeData {
+  [key: string]: WasteSubtypeData;
+}
+
+interface WasteSubtypes {
+  [key: string]: WasteTypeData;
+}
+
 // Updated waste pricing structure
-const WASTE_SUBTYPES = {
+const WASTE_SUBTYPES: WasteSubtypes = {
   metal: {
     copper: { min: 400, max: 570, unit: 'kg' },
     brass: { min: 300, max: 400, unit: 'kg' },
@@ -94,7 +108,7 @@ const Upload = () => {
   const calculateEarnings = () => {
     if (!wasteWeight || !wasteType || !wasteSubtype || wasteWeight < 10) return { min: 0, max: 0 };
     
-    const subtypeData = WASTE_SUBTYPES[wasteType as keyof typeof WASTE_SUBTYPES]?.[wasteSubtype];
+    const subtypeData = WASTE_SUBTYPES[wasteType]?.[wasteSubtype];
     if (!subtypeData) return { min: 0, max: 0 };
     
     const multiplier = subtypeData.unit === 'piece' ? 1 : wasteWeight;
@@ -102,6 +116,11 @@ const Upload = () => {
       min: subtypeData.min * multiplier,
       max: subtypeData.max * multiplier
     };
+  };
+
+  const calculateEcoPoints = () => {
+    if (!wasteWeight || wasteWeight < 10) return 0;
+    return Math.floor(wasteWeight / 10) * 200; // 200 points per 10kg
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -147,6 +166,7 @@ const Upload = () => {
     
     try {
       const earnings = calculateEarnings();
+      const ecoPoints = calculateEcoPoints();
       const avgEarning = (earnings.min + earnings.max) / 2;
       
       const { error } = await supabase
@@ -163,6 +183,13 @@ const Upload = () => {
         });
 
       if (error) throw error;
+
+      // Store the reward calculations in localStorage for the reward page
+      localStorage.setItem('rewardData', JSON.stringify({
+        cashReward: avgEarning,
+        ecoPoints: ecoPoints,
+        weight: wasteWeight
+      }));
 
       toast({
         title: "Success!",
@@ -182,7 +209,8 @@ const Upload = () => {
   };
 
   const earnings = calculateEarnings();
-  const subtypeOptions = wasteType ? WASTE_SUBTYPES[wasteType as keyof typeof WASTE_SUBTYPES] : {};
+  const ecoPoints = calculateEcoPoints();
+  const subtypeOptions = wasteType ? WASTE_SUBTYPES[wasteType] : {};
 
   return (
     <div className="min-h-screen flex flex-col" style={{ 
@@ -234,12 +262,20 @@ const Upload = () => {
                       <SelectContent>
                         {Object.entries(subtypeOptions).map(([key, data]) => (
                           <SelectItem key={key} value={key}>
-                            {key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')} 
-                            (₹{data.min}{data.min !== data.max ? ` - ₹${data.max}` : ''} per {data.unit})
+                            {key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                )}
+
+                {wasteType && wasteSubtype && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="text-blue-800 font-medium mb-2">Pricing Information:</div>
+                    <p className="text-blue-700 text-sm">
+                      ₹{subtypeOptions[wasteSubtype]?.min}{subtypeOptions[wasteSubtype]?.min !== subtypeOptions[wasteSubtype]?.max ? ` - ₹${subtypeOptions[wasteSubtype]?.max}` : ''} per {subtypeOptions[wasteSubtype]?.unit}
+                    </p>
                   </div>
                 )}
 
@@ -327,16 +363,22 @@ const Upload = () => {
                 </div>
 
                 {wasteWeight && wasteWeight >= 10 && wasteType && wasteSubtype && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-green-800 font-medium">Estimated Earnings:</span>
+                      <span className="text-green-800 font-medium">Estimated Cash Earnings:</span>
                       <span className="text-green-600 font-bold text-xl flex items-center">
                         <IndianRupee className="h-5 w-5 mr-1" />
                         {earnings.min === earnings.max ? earnings.min.toFixed(2) : `${earnings.min.toFixed(2)} - ${earnings.max.toFixed(2)}`}
                       </span>
                     </div>
-                    <p className="text-green-700 text-sm mt-1">
-                      {wasteWeight}kg × ₹{earnings.min === earnings.max ? earnings.min : `${earnings.min} - ${earnings.max}`}/{subtypeOptions[wasteSubtype]?.unit || 'kg'}
+                    <div className="flex items-center justify-between">
+                      <span className="text-green-800 font-medium">Estimated Eco Points:</span>
+                      <span className="text-green-600 font-bold text-xl">
+                        {ecoPoints} pts
+                      </span>
+                    </div>
+                    <p className="text-green-700 text-sm">
+                      {wasteWeight}kg × ₹{earnings.min === earnings.max ? earnings.min : `${earnings.min} - ${earnings.max}`}/{subtypeOptions[wasteSubtype]?.unit || 'kg'} | {Math.floor(wasteWeight / 10)} × 200 pts
                     </p>
                   </div>
                 )}
