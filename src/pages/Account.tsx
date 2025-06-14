@@ -9,12 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { IndianRupee, Trophy } from "lucide-react";
+import { IndianRupee } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import Leaderboard from "@/components/Leaderboard";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface UserProfile {
   id: string;
@@ -206,20 +204,6 @@ const Account = () => {
               </div>
             </div>
             <div className="mt-4 md:mt-0 flex gap-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="bg-white">
-                    <Trophy className="h-4 w-4 mr-2" />
-                    Leaderboard
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Eco-Score Leaderboard</DialogTitle>
-                  </DialogHeader>
-                  <Leaderboard />
-                </DialogContent>
-              </Dialog>
               <Button variant="outline" className="bg-white" onClick={() => setEditMode(!editMode)}>
                 {editMode ? 'Cancel Edit' : 'Edit Profile'}
               </Button>
