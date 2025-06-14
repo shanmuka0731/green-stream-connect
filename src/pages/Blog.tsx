@@ -166,7 +166,7 @@ const additionalBlogPosts = [
     date: "April 10, 2025",
     author: "Diana Prince",
     category: "Community",
-    imageUrl: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://imageio.forbes.com/specials-images/imageserve/624d96b19155c209e2d7efd7/Cityscape-mixed-with-green-plants--multi-layered-image/960x0.jpg?height=473&width=711&fit=bounds",
     content: `
       <p>As municipal recycling programs face challenges from changing markets and budget constraints, communities across the country are developing their own solutions to waste management problems.</p>
       
