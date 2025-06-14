@@ -21,7 +21,6 @@ interface UserProfile {
   full_name: string | null;
   username: string | null;
   phone_number: string | null;
-  avatar_url: string | null;
 }
 
 interface LeaderboardData {
@@ -40,16 +39,6 @@ interface PickupOrder {
   reward_amount: number;
 }
 
-interface RegisteredOrg {
-  id: string;
-  organization_name: string;
-  email: string;
-  phone: string;
-  address: string;
-  waste_types: string;
-  created_at: string;
-}
-
 const Account = () => {
   const { toast } = useToast();
   const { user, loading } = useAuth();
@@ -59,7 +48,6 @@ const Account = () => {
   const [editMode, setEditMode] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null);
   const [pickupOrders, setPickupOrders] = useState<PickupOrder[]>([]);
-  const [registeredOrgs, setRegisteredOrgs] = useState<RegisteredOrg[]>([]);
   const [formData, setFormData] = useState({
     full_name: '',
     username: '',
@@ -79,7 +67,6 @@ const Account = () => {
       loadProfile();
       loadLeaderboardData();
       loadPickupOrders();
-      loadRegisteredOrgs();
     }
   }, [user]);
 
@@ -88,7 +75,7 @@ const Account = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, username, phone_number, avatar_url')
+        .select('id, full_name, username, phone_number')
         .eq('id', user.id)
         .single();
 
@@ -151,25 +138,6 @@ const Account = () => {
     }
   };
 
-  const loadRegisteredOrgs = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('register_organizations')
-        .select('id, organization_name, email, phone, address, waste_types, created_at')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (error) {
-        console.error('Error loading registered organizations:', error);
-        return;
-      }
-
-      setRegisteredOrgs(data || []);
-    } catch (error) {
-      console.error('Error loading registered organizations:', error);
-    }
-  };
-
   const handleSaveChanges = async () => {
     if (!user) return;
     setIsLoading(true);
@@ -228,7 +196,6 @@ const Account = () => {
           <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center space-x-4">
               <Avatar className="h-20 w-20">
-                <AvatarImage src={profile?.avatar_url || ""} alt="User" />
                 <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
               <div>
@@ -266,137 +233,60 @@ const Account = () => {
             </TabsList>
             
             <TabsContent value="profile" className="mt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="transition-colors hover:bg-white">
-                  <CardHeader>
-                    <CardTitle>Personal Information</CardTitle>
-                    <CardDescription>
-                      {editMode ? 'Update your personal details here.' : 'Your personal information.'}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="full-name">Full name</Label>
-                        <Input 
-                          id="full-name" 
-                          value={formData.full_name} 
-                          onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} 
-                          disabled={!editMode} 
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="username">Username</Label>
-                        <Input 
-                          id="username" 
-                          value={formData.username} 
-                          onChange={(e) => setFormData({ ...formData, username: e.target.value })} 
-                          disabled={!editMode} 
-                        />
-                      </div>
-                    </div>
+              <Card className="transition-colors hover:bg-white">
+                <CardHeader>
+                  <CardTitle>Personal Information</CardTitle>
+                  <CardDescription>
+                    {editMode ? 'Update your personal details here.' : 'Your personal information.'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" value={user.email || ''} disabled />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone number</Label>
+                      <Label htmlFor="full-name">Full name</Label>
                       <Input 
-                        id="phone" 
-                        value={formData.phone_number} 
-                        onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} 
+                        id="full-name" 
+                        value={formData.full_name} 
+                        onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} 
                         disabled={!editMode} 
                       />
                     </div>
-                  </CardContent>
-                  {editMode && (
-                    <CardFooter>
-                      <Button 
-                        className="bg-green-600 hover:bg-green-700 text-white" 
-                        onClick={handleSaveChanges} 
-                        disabled={isLoading}
-                      >
-                        {isLoading ? "Saving..." : "Save Changes"}
-                      </Button>
-                    </CardFooter>
-                  )}
-                </Card>
-
-                <div className="space-y-6">
-                  <Card className="transition-colors hover:bg-white">
-                    <CardHeader>
-                      <CardTitle>Recent Pickup Orders</CardTitle>
-                      <CardDescription>Your recent waste collection orders.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {pickupOrders.length === 0 ? (
-                          <p className="text-gray-500 text-center py-4">No pickup orders yet.</p>
-                        ) : (
-                          pickupOrders.map((order) => (
-                            <div key={order.id} className="border-b pb-4 last:border-0">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <p className="font-medium">
-                                    {order.waste_type.charAt(0).toUpperCase() + order.waste_type.slice(1)} - {order.waste_subtype}
-                                  </p>
-                                  <p className="text-sm text-gray-500">
-                                    {new Date(order.created_at).toLocaleDateString()}
-                                  </p>
-                                </div>
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  order.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                                  order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                                  'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                                </span>
-                              </div>
-                              <p className="mt-2 text-sm text-gray-600">
-                                {order.weight}kg - ₹{order.reward_amount?.toFixed(2) || '0.00'}
-                              </p>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="transition-colors hover:bg-white">
-                    <CardHeader>
-                      <CardTitle>Recently Registered Organizations</CardTitle>
-                      <CardDescription>Organizations that recently joined the platform.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {registeredOrgs.length === 0 ? (
-                          <p className="text-gray-500 text-center py-4">No registered organizations yet.</p>
-                        ) : (
-                          registeredOrgs.map((org) => (
-                            <div key={org.id} className="border-b pb-4 last:border-0">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <p className="font-medium">{org.organization_name}</p>
-                                  <p className="text-sm text-gray-500">{org.email}</p>
-                                  <p className="text-sm text-gray-500">{org.phone}</p>
-                                </div>
-                                <div className="text-right">
-                                  <p className="text-sm text-gray-500">
-                                    {new Date(org.created_at).toLocaleDateString()}
-                                  </p>
-                                </div>
-                              </div>
-                              <p className="mt-2 text-sm text-gray-600">
-                                Waste Types: {org.waste_types}
-                              </p>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="username">Username</Label>
+                      <Input 
+                        id="username" 
+                        value={formData.username} 
+                        onChange={(e) => setFormData({ ...formData, username: e.target.value })} 
+                        disabled={!editMode} 
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" value={user.email || ''} disabled />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone number</Label>
+                    <Input 
+                      id="phone" 
+                      value={formData.phone_number} 
+                      onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} 
+                      disabled={!editMode} 
+                    />
+                  </div>
+                </CardContent>
+                {editMode && (
+                  <CardFooter>
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700 text-white" 
+                      onClick={handleSaveChanges} 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </CardFooter>
+                )}
+              </Card>
             </TabsContent>
             
             <TabsContent value="rewards" className="mt-6">

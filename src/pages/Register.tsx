@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,14 +24,47 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+interface RegisteredOrg {
+  id: string;
+  organization_name: string;
+  email: string;
+  phone: string;
+  address: string;
+  waste_types: string;
+  created_at: string;
+}
+
 const Register = () => {
   const { toast } = useToast();
   const [registrations, setRegistrations] = useState<FormValues[]>([]);
+  const [registeredOrgs, setRegisteredOrgs] = useState<RegisteredOrg[]>([]);
   const [pickups] = useState([
     { id: 1, location: "123 Green St", status: "Pending", wasteType: "Plastic" },
     { id: 2, location: "456 Eco Ave", status: "Confirmed", wasteType: "Paper" },
     { id: 3, location: "789 Recycle Rd", status: "Completed", wasteType: "Metal" }
   ]);
+
+  useEffect(() => {
+    loadRegisteredOrgs();
+  }, []);
+
+  const loadRegisteredOrgs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('register_organizations')
+        .select('id, organization_name, email, phone, address, waste_types, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error loading registered organizations:', error);
+        return;
+      }
+
+      setRegisteredOrgs(data || []);
+    } catch (error) {
+      console.error('Error loading registered organizations:', error);
+    }
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -62,6 +95,9 @@ const Register = () => {
 
       // Update local state for immediate UI feedback
       setRegistrations([...registrations, data]);
+      
+      // Reload registered organizations
+      await loadRegisteredOrgs();
       
       toast({
         title: "Success",
@@ -197,7 +233,7 @@ const Register = () => {
               <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] mb-4">
                 Recently Registered Organizations
               </h2>
-              {registrations.length > 0 ? (
+              {registeredOrgs.length > 0 ? (
                 <div className="bg-white rounded-lg shadow overflow-hidden">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -211,13 +247,16 @@ const Register = () => {
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Waste Types
                         </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {registrations.map((org, idx) => (
-                        <tr key={idx}>
+                      {registeredOrgs.map((org) => (
+                        <tr key={org.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{org.organizationName}</div>
+                            <div className="text-sm font-medium text-gray-900">{org.organization_name}</div>
                             <div className="text-sm text-gray-500">{org.address}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -225,7 +264,10 @@ const Register = () => {
                             <div className="text-sm text-gray-500">{org.phone}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {org.wasteTypes}
+                            {org.waste_types}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {new Date(org.created_at).toLocaleDateString()}
                           </td>
                         </tr>
                       ))}
