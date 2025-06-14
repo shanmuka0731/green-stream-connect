@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -191,6 +190,23 @@ const Account = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Calculate total rewards including latest reward data
+  const calculateTotalCash = () => {
+    let total = leaderboardData?.total_cash_earned || 0;
+    if (rewardData && rewardData.selectedRewardType === 'cash') {
+      total += rewardData.cashReward;
+    }
+    return total;
+  };
+
+  const calculateTotalEcoPoints = () => {
+    let total = leaderboardData?.total_eco_points || 0;
+    if (rewardData && rewardData.selectedRewardType === 'ecoscore') {
+      total += rewardData.ecoPoints;
+    }
+    return total;
   };
 
   if (loading) {
@@ -399,7 +415,7 @@ const Account = () => {
                 <Card className="transition-colors hover:bg-white">
                   <CardHeader>
                     <CardTitle>Your Total Rewards</CardTitle>
-                    <CardDescription>Track your overall earnings and points.</CardDescription>
+                    <CardDescription>Track your overall earnings and points (including latest reward).</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -408,7 +424,7 @@ const Account = () => {
                           <CardDescription>Total Cash Earned</CardDescription>
                           <CardTitle className="text-2xl text-green-600 flex items-center">
                             <IndianRupee size={20} className="mr-1" />
-                            {leaderboardData?.total_cash_earned?.toFixed(2) || '0.00'}
+                            {calculateTotalCash().toFixed(2)}
                           </CardTitle>
                         </CardHeader>
                       </Card>
@@ -416,7 +432,7 @@ const Account = () => {
                         <CardHeader className="pb-2">
                           <CardDescription>Eco-Score Points</CardDescription>
                           <CardTitle className="text-2xl text-green-600">
-                            {leaderboardData?.total_eco_points || 0} pts
+                            {calculateTotalEcoPoints()} pts
                           </CardTitle>
                         </CardHeader>
                       </Card>
