@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -18,12 +19,6 @@ interface UserProfile {
   full_name: string | null;
   username: string | null;
   phone_number: string | null;
-}
-
-interface LeaderboardData {
-  total_cash_earned: number;
-  total_eco_points: number;
-  total_orders: number;
 }
 
 interface PickupOrder {
@@ -50,7 +45,6 @@ const Account = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null);
   const [pickupOrders, setPickupOrders] = useState<PickupOrder[]>([]);
   const [rewardData, setRewardData] = useState<RewardData | null>(null);
   const [formData, setFormData] = useState({
@@ -66,11 +60,10 @@ const Account = () => {
     }
   }, [user, loading, navigate]);
 
-  // Load user profile and leaderboard data
+  // Load user profile and pickup orders
   useEffect(() => {
     if (user) {
       loadProfile();
-      loadLeaderboardData();
       loadPickupOrders();
       loadRewardData();
     }
@@ -117,26 +110,6 @@ const Account = () => {
       }
     } catch (error) {
       console.error('Error loading profile:', error);
-    }
-  };
-
-  const loadLeaderboardData = async () => {
-    if (!user) return;
-    try {
-      const { data, error } = await supabase
-        .from('eco_score_leaderboard')
-        .select('total_cash_earned, total_eco_points, total_orders')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error loading leaderboard data:', error);
-        return;
-      }
-
-      setLeaderboardData(data);
-    } catch (error) {
-      console.error('Error loading leaderboard data:', error);
     }
   };
 
@@ -192,9 +165,12 @@ const Account = () => {
     }
   };
 
-  // Calculate total rewards including latest reward data
+  // Calculate total rewards from completed orders and latest reward data
   const calculateTotalCash = () => {
-    let total = leaderboardData?.total_cash_earned || 0;
+    let total = pickupOrders
+      .filter(order => order.status === 'completed' && order.reward_amount)
+      .reduce((sum, order) => sum + order.reward_amount, 0);
+    
     if (rewardData && rewardData.selectedRewardType === 'cash') {
       total += rewardData.cashReward;
     }
@@ -202,11 +178,15 @@ const Account = () => {
   };
 
   const calculateTotalEcoPoints = () => {
-    let total = leaderboardData?.total_eco_points || 0;
+    // Since we don't have eco points in pickup_orders, only count from latest reward
     if (rewardData && rewardData.selectedRewardType === 'ecoscore') {
-      total += rewardData.ecoPoints;
+      return rewardData.ecoPoints;
     }
-    return total;
+    return 0;
+  };
+
+  const getTotalOrders = () => {
+    return pickupOrders.filter(order => order.status === 'completed').length;
   };
 
   if (loading) {
@@ -440,7 +420,7 @@ const Account = () => {
                         <CardHeader className="pb-2">
                           <CardDescription>Total Orders</CardDescription>
                           <CardTitle className="text-2xl text-green-600">
-                            {leaderboardData?.total_orders || 0}
+                            {getTotalOrders()}
                           </CardTitle>
                         </CardHeader>
                       </Card>

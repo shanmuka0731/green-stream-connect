@@ -9,33 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      eco_score_leaderboard: {
-        Row: {
-          id: string
-          total_cash_earned: number
-          total_eco_points: number
-          total_orders: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          total_cash_earned?: number
-          total_eco_points?: number
-          total_orders?: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          id?: string
-          total_cash_earned?: number
-          total_eco_points?: number
-          total_orders?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       pickup_orders: {
         Row: {
           created_at: string
