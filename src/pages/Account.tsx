@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -8,32 +9,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { IndianRupee } from "lucide-react";
+import { IndianRupee, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import Leaderboard from "@/components/Leaderboard";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
 interface UserProfile {
   id: string;
   full_name: string | null;
   username: string | null;
   phone_number: string | null;
+  avatar_url: string | null;
 }
+
+interface LeaderboardData {
+  total_cash_earned: number;
+  total_eco_points: number;
+  total_orders: number;
+}
+
 const Account = () => {
-  const {
-    toast
-  } = useToast();
-  const {
-    user,
-    loading
-  } = useAuth();
+  const { toast } = useToast();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null);
   const [formData, setFormData] = useState({
     full_name: '',
     username: '',
-    phone_number: ''
+    phone_number: '',
+    avatar_url: ''
   });
 
   // Redirect if not authenticated
@@ -43,48 +52,75 @@ const Account = () => {
     }
   }, [user, loading, navigate]);
 
-  // Load user profile
+  // Load user profile and leaderboard data
   useEffect(() => {
     if (user) {
       loadProfile();
+      loadLeaderboardData();
     }
   }, [user]);
+
   const loadProfile = async () => {
     if (!user) return;
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('profiles').select('id, full_name, username, phone_number').eq('id', user.id).single();
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, phone_number, avatar_url')
+        .eq('id', user.id)
+        .single();
+
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading profile:', error);
         return;
       }
+
       if (data) {
         setProfile(data);
         setFormData({
           full_name: data.full_name || '',
           username: data.username || '',
-          phone_number: data.phone_number || ''
+          phone_number: data.phone_number || '',
+          avatar_url: data.avatar_url || ''
         });
       }
     } catch (error) {
       console.error('Error loading profile:', error);
     }
   };
+
+  const loadLeaderboardData = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('eco_score_leaderboard')
+        .select('total_cash_earned, total_eco_points, total_orders')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading leaderboard data:', error);
+        return;
+      }
+
+      setLeaderboardData(data);
+    } catch (error) {
+      console.error('Error loading leaderboard data:', error);
+    }
+  };
+
   const handleSaveChanges = async () => {
     if (!user) return;
     setIsLoading(true);
     try {
-      const {
-        error
-      } = await supabase.from('profiles').upsert({
-        id: user.id,
-        ...formData
-      });
-      if (error) {
-        throw error;
-      }
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          ...formData
+        });
+
+      if (error) throw error;
+
       await loadProfile();
       setEditMode(false);
       toast({
@@ -102,26 +138,35 @@ const Account = () => {
       setIsLoading(false);
     }
   };
+
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">
+    return (
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">Loading...</div>
-      </div>;
+      </div>
+    );
   }
+
   if (!user) {
     return null;
   }
-  const userInitials = profile?.full_name ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : user.email?.charAt(0).toUpperCase() || 'U';
-  return <div className="min-h-screen flex flex-col">
+
+  const userInitials = profile?.full_name 
+    ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase() 
+    : user.email?.charAt(0).toUpperCase() || 'U';
+
+  return (
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       <main style={{
-      backgroundBlendMode: 'overlay',
-      backgroundColor: 'rgba(14, 18, 16, 0.7)'
-    }} className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-900">
+        backgroundBlendMode: 'overlay',
+        backgroundColor: 'rgba(14, 18, 16, 0.7)'
+      }} className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-900">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center space-x-4">
               <Avatar className="h-20 w-20">
-                <AvatarImage src="" alt="User" />
+                <AvatarImage src={profile?.avatar_url || ""} alt="User" />
                 <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
               <div>
@@ -131,7 +176,21 @@ const Account = () => {
                 <p className="text-gray-500">{user.email}</p>
               </div>
             </div>
-            <div className="mt-4 md:mt-0">
+            <div className="mt-4 md:mt-0 flex gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="bg-white">
+                    <Trophy className="h-4 w-4 mr-2" />
+                    Leaderboard
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Eco-Score Leaderboard</DialogTitle>
+                  </DialogHeader>
+                  <Leaderboard />
+                </DialogContent>
+              </Dialog>
               <Button variant="outline" className="bg-white" onClick={() => setEditMode(!editMode)}>
                 {editMode ? 'Cancel Edit' : 'Edit Profile'}
               </Button>
@@ -145,10 +204,7 @@ const Account = () => {
               <TabsTrigger value="rewards">Rewards</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="profile" className="mt-6" style={{
-            backgroundBlendMode: 'overlay',
-            backgroundColor: 'rgba(14, 18, 16, 0.7)'
-          }}>
+            <TabsContent value="profile" className="mt-6">
               <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Personal Information</CardTitle>
@@ -160,17 +216,21 @@ const Account = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="full-name">Full name</Label>
-                      <Input id="full-name" value={formData.full_name} onChange={e => setFormData({
-                      ...formData,
-                      full_name: e.target.value
-                    })} disabled={!editMode} />
+                      <Input 
+                        id="full-name" 
+                        value={formData.full_name} 
+                        onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} 
+                        disabled={!editMode} 
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="username">Username</Label>
-                      <Input id="username" value={formData.username} onChange={e => setFormData({
-                      ...formData,
-                      username: e.target.value
-                    })} disabled={!editMode} />
+                      <Input 
+                        id="username" 
+                        value={formData.username} 
+                        onChange={(e) => setFormData({ ...formData, username: e.target.value })} 
+                        disabled={!editMode} 
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -179,24 +239,39 @@ const Account = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone number</Label>
-                    <Input id="phone" value={formData.phone_number} onChange={e => setFormData({
-                    ...formData,
-                    phone_number: e.target.value
-                  })} disabled={!editMode} />
+                    <Input 
+                      id="phone" 
+                      value={formData.phone_number} 
+                      onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} 
+                      disabled={!editMode} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="avatar-url">Avatar URL</Label>
+                    <Input 
+                      id="avatar-url" 
+                      value={formData.avatar_url} 
+                      onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })} 
+                      disabled={!editMode} 
+                      placeholder="https://example.com/avatar.jpg"
+                    />
                   </div>
                 </CardContent>
-                {editMode && <CardFooter>
-                    <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveChanges} disabled={isLoading}>
+                {editMode && (
+                  <CardFooter>
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700 text-white" 
+                      onClick={handleSaveChanges} 
+                      disabled={isLoading}
+                    >
                       {isLoading ? "Saving..." : "Save Changes"}
                     </Button>
-                  </CardFooter>}
+                  </CardFooter>
+                )}
               </Card>
             </TabsContent>
             
-            <TabsContent value="activity" className="mt-6" style={{
-            backgroundBlendMode: 'overlay',
-            backgroundColor: 'rgba(14, 18, 16, 0.7)'
-          }}>
+            <TabsContent value="activity" className="mt-6">
               <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
@@ -204,9 +279,8 @@ const Account = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {Array.from({
-                    length: 5
-                  }).map((_, i) => <div key={i} className="border-b pb-4 last:border-0">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className="border-b pb-4 last:border-0">
                         <div className="flex justify-between items-start">
                           <div>
                             <p className="font-medium">
@@ -221,9 +295,14 @@ const Account = () => {
                           </span>
                         </div>
                         <p className="mt-2 text-sm text-gray-600">
-                          {i === 0 ? "3.2kg of recyclable waste" : i === 1 ? "2.5kg of paper and cardboard" : i === 2 ? "1 old laptop and 2 mobile phones" : i === 3 ? "5 glass bottles and containers" : "1.8kg of mixed recyclables"}
+                          {i === 0 ? "3.2kg of recyclable waste" : 
+                           i === 1 ? "2.5kg of paper and cardboard" : 
+                           i === 2 ? "1 old laptop and 2 mobile phones" : 
+                           i === 3 ? "5 glass bottles and containers" : 
+                           "1.8kg of mixed recyclables"}
                         </p>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -232,10 +311,7 @@ const Account = () => {
               </Card>
             </TabsContent>
             
-            <TabsContent value="rewards" className="mt-6" style={{
-            backgroundBlendMode: 'overlay',
-            backgroundColor: 'rgba(14, 18, 16, 0.7)'
-          }}>
+            <TabsContent value="rewards" className="mt-6">
               <Card className="transition-colors hover:bg-white">
                 <CardHeader>
                   <CardTitle>Your Rewards</CardTitle>
@@ -248,29 +324,32 @@ const Account = () => {
                         <CardDescription>Total Cash Earned</CardDescription>
                         <CardTitle className="text-2xl text-green-600 flex items-center">
                           <IndianRupee size={20} className="mr-1" />
-                          3,250.00
+                          {leaderboardData?.total_cash_earned?.toFixed(2) || '0.00'}
                         </CardTitle>
                       </CardHeader>
                     </Card>
                     <Card className="transition-colors hover:bg-white">
                       <CardHeader className="pb-2">
                         <CardDescription>Eco-Score Points</CardDescription>
-                        <CardTitle className="text-2xl text-green-600">3,250 pts</CardTitle>
+                        <CardTitle className="text-2xl text-green-600">
+                          {leaderboardData?.total_eco_points || 0} pts
+                        </CardTitle>
                       </CardHeader>
                     </Card>
                     <Card className="transition-colors hover:bg-white">
                       <CardHeader className="pb-2">
-                        <CardDescription>E-Gift Cards Redeemed</CardDescription>
-                        <CardTitle className="text-2xl text-green-600">3</CardTitle>
+                        <CardDescription>Total Orders</CardDescription>
+                        <CardTitle className="text-2xl text-green-600">
+                          {leaderboardData?.total_orders || 0}
+                        </CardTitle>
                       </CardHeader>
                     </Card>
                   </div>
                   
                   <h3 className="text-lg font-medium mb-4">Recent Rewards</h3>
                   <div className="space-y-4">
-                    {Array.from({
-                    length: 3
-                  }).map((_, i) => <div key={i} className="flex justify-between items-center p-4 border rounded-lg transition-colors hover:bg-white">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="flex justify-between items-center p-4 border rounded-lg transition-colors hover:bg-white">
                         <div>
                           <p className="font-medium">
                             {i === 0 ? "Cash Reward" : i === 1 ? "Eco-Score Points" : "E-Gift Card (Amazon)"}
@@ -280,15 +359,22 @@ const Account = () => {
                           </p>
                         </div>
                         <p className="font-bold text-green-600 flex items-center">
-                          {i === 0 ? <>
+                          {i === 0 ? (
+                            <>
                               <IndianRupee size={16} className="mr-1" />
                               375.00
-                            </> : i === 1 ? "500 pts" : <>
+                            </>
+                          ) : i === 1 ? (
+                            "500 pts"
+                          ) : (
+                            <>
                               <IndianRupee size={16} className="mr-1" />
                               412.50
-                            </>}
+                            </>
+                          )}
                         </p>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -300,6 +386,8 @@ const Account = () => {
         </div>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Account;

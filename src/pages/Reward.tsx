@@ -9,14 +9,21 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Check } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Reward = () => {
   const [selectedReward, setSelectedReward] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Mock reward amounts - in real app, this would come from the pickup order
+  const mockRewardAmount = 375.00;
+  const ecoPointsConversion = Math.floor(mockRewardAmount * 10); // 1 rupee = 10 points
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!selectedReward) {
@@ -27,18 +34,50 @@ const Reward = () => {
       });
       return;
     }
+
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Please login to continue",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsProcessing(true);
     
-    // Simulate processing
-    setTimeout(() => {
-      setIsProcessing(false);
+    try {
+      // Update the leaderboard based on reward type
+      const rewardAmount = selectedReward === 'ecoscore' ? ecoPointsConversion : mockRewardAmount;
+      
+      const { error } = await supabase
+        .from('eco_score_leaderboard')
+        .upsert({
+          user_id: user.id,
+          total_cash_earned: selectedReward === 'cash' || selectedReward === 'egift' ? mockRewardAmount : 0,
+          total_eco_points: selectedReward === 'ecoscore' ? ecoPointsConversion : 0,
+          total_orders: 1
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) throw error;
+
       toast({
         title: "Success!",
-        description: "Pickup confirmed and reward selected",
+        description: `Pickup confirmed and ${selectedReward === 'ecoscore' ? 'eco-points' : 'cash reward'} selected`,
       });
-      navigate("/");
-    }, 1500);
+      navigate("/account");
+    } catch (error) {
+      console.error('Error updating rewards:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process reward",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -86,7 +125,7 @@ const Reward = () => {
                         <div className="text-sm text-gray-500">Receive payment directly to your bank account</div>
                       </div>
                     </Label>
-                    <div className="text-green-600 font-bold">₹5.00</div>
+                    <div className="text-green-600 font-bold">₹{mockRewardAmount.toFixed(2)}</div>
                   </div>
                   
                   <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -97,7 +136,7 @@ const Reward = () => {
                         <div className="text-sm text-gray-500">Earn points to redeem for eco-friendly products</div>
                       </div>
                     </Label>
-                    <div className="text-green-600 font-bold">500 pts</div>
+                    <div className="text-green-600 font-bold">{ecoPointsConversion} pts</div>
                   </div>
                   
                   <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -108,7 +147,7 @@ const Reward = () => {
                         <div className="text-sm text-gray-500">Get a digital gift card from popular retailers</div>
                       </div>
                     </Label>
-                    <div className="text-green-600 font-bold">₹5.50</div>
+                    <div className="text-green-600 font-bold">₹{(mockRewardAmount * 1.1).toFixed(2)}</div>
                   </div>
                 </RadioGroup>
               </CardContent>

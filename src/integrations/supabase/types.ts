@@ -9,8 +9,81 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      eco_score_leaderboard: {
+        Row: {
+          id: string
+          total_cash_earned: number
+          total_eco_points: number
+          total_orders: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          total_cash_earned?: number
+          total_eco_points?: number
+          total_orders?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          total_cash_earned?: number
+          total_eco_points?: number
+          total_orders?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pickup_orders: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          reward_amount: number | null
+          reward_type: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          waste_subtype: string | null
+          waste_type: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          reward_amount?: number | null
+          reward_type?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          waste_subtype?: string | null
+          waste_type: string
+          weight: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          reward_amount?: number | null
+          reward_type?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          waste_subtype?: string | null
+          waste_type?: string
+          weight?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string | null
           full_name: string
           id: string
@@ -19,6 +92,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string | null
           full_name: string
           id: string
@@ -27,12 +101,46 @@ export type Database = {
           username: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string | null
           full_name?: string
           id?: string
           phone_number?: string | null
           updated_at?: string | null
           username?: string
+        }
+        Relationships: []
+      }
+      register_organizations: {
+        Row: {
+          address: string
+          created_at: string
+          description: string
+          email: string
+          id: string
+          organization_name: string
+          phone: string
+          waste_types: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          description: string
+          email: string
+          id?: string
+          organization_name: string
+          phone: string
+          waste_types: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          description?: string
+          email?: string
+          id?: string
+          organization_name?: string
+          phone?: string
+          waste_types?: string
         }
         Relationships: []
       }

@@ -11,20 +11,45 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Weight, AlertTriangle, IndianRupee } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
-// Waste pricing per kg
-const WASTE_PRICES = {
-  plastic: 15,
-  paper: 8,
-  electronics: 25,
-  glass: 5,
-  metal: 30,
-  organic: 3,
-  other: 10
-} as const;
+// Updated waste pricing structure
+const WASTE_SUBTYPES = {
+  metal: {
+    copper: { min: 400, max: 570, unit: 'kg' },
+    brass: { min: 300, max: 400, unit: 'kg' },
+    aluminum: { min: 100, max: 140, unit: 'kg' },
+    iron: { min: 22, max: 38, unit: 'kg' },
+    tin: { min: 14, max: 16, unit: 'kg' },
+    stainless: { min: 40, max: 45, unit: 'kg' }
+  },
+  paper: {
+    newspaper: { min: 10, max: 10, unit: 'kg' },
+    books: { min: 7, max: 8, unit: 'kg' },
+    cardboard: { min: 4, max: 5, unit: 'kg' }
+  },
+  plastic: {
+    hard: { min: 2, max: 2, unit: 'kg' },
+    soft: { min: 6, max: 7, unit: 'kg' }
+  },
+  electronics: {
+    general: { min: 20, max: 500, unit: 'kg' },
+    laptops: { min: 150, max: 800, unit: 'piece' },
+    phones: { min: 15, max: 40, unit: 'piece' },
+    crt_tv: { min: 100, max: 200, unit: 'piece' },
+    lcd_tv: { min: 100, max: 500, unit: 'piece' }
+  },
+  other: {
+    tyres: { min: 3, max: 4, unit: 'kg' },
+    batteries: { min: 50, max: 80, unit: 'piece' },
+    mix: { min: 5, max: 6, unit: 'kg' }
+  }
+};
 
 const Upload = () => {
   const [wasteType, setWasteType] = useState("");
+  const [wasteSubtype, setWasteSubtype] = useState("");
   const [description, setDescription] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [image, setImage] = useState<string | null>(null);
@@ -33,6 +58,7 @@ const Upload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -66,18 +92,34 @@ const Upload = () => {
   };
 
   const calculateEarnings = () => {
-    if (!wasteWeight || !wasteType || wasteWeight < 10) return 0;
-    const pricePerKg = WASTE_PRICES[wasteType as keyof typeof WASTE_PRICES] || 0;
-    return wasteWeight * pricePerKg;
+    if (!wasteWeight || !wasteType || !wasteSubtype || wasteWeight < 10) return { min: 0, max: 0 };
+    
+    const subtypeData = WASTE_SUBTYPES[wasteType as keyof typeof WASTE_SUBTYPES]?.[wasteSubtype];
+    if (!subtypeData) return { min: 0, max: 0 };
+    
+    const multiplier = subtypeData.unit === 'piece' ? 1 : wasteWeight;
+    return {
+      min: subtypeData.min * multiplier,
+      max: subtypeData.max * multiplier
+    };
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!wasteType) {
+    if (!user) {
       toast({
         title: "Error",
-        description: "Please select a waste type",
+        description: "Please login to continue",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!wasteType || !wasteSubtype) {
+      toast({
+        title: "Error",
+        description: "Please select waste type and subtype",
         variant: "destructive",
       });
       return;
@@ -103,19 +145,44 @@ const Upload = () => {
     
     setIsUploading(true);
     
-    // Simulate upload process
-    setTimeout(() => {
-      setIsUploading(false);
+    try {
       const earnings = calculateEarnings();
+      const avgEarning = (earnings.min + earnings.max) / 2;
+      
+      const { error } = await supabase
+        .from('pickup_orders')
+        .insert({
+          user_id: user.id,
+          waste_type: wasteType,
+          waste_subtype: wasteSubtype,
+          weight: wasteWeight,
+          description,
+          image_url: image,
+          reward_amount: avgEarning,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
       toast({
         title: "Success!",
-        description: `Waste information uploaded successfully. Estimated earnings: ₹${earnings.toFixed(2)}`,
+        description: `Waste information uploaded successfully. Estimated earnings: ₹${earnings.min} - ₹${earnings.max}`,
       });
       navigate("/pickup");
-    }, 1500);
+    } catch (error) {
+      console.error('Error creating pickup order:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create pickup order",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const earnings = calculateEarnings();
+  const subtypeOptions = wasteType ? WASTE_SUBTYPES[wasteType as keyof typeof WASTE_SUBTYPES] : {};
 
   return (
     <div className="min-h-screen flex flex-col" style={{ 
@@ -140,21 +207,41 @@ const Upload = () => {
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="waste-type">Select Waste Type</Label>
-                  <Select value={wasteType} onValueChange={setWasteType}>
+                  <Select value={wasteType} onValueChange={(value) => {
+                    setWasteType(value);
+                    setWasteSubtype("");
+                  }}>
                     <SelectTrigger id="waste-type" className="w-full">
                       <SelectValue placeholder="Select waste type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="plastic">Plastic (₹{WASTE_PRICES.plastic}/kg)</SelectItem>
-                      <SelectItem value="paper">Paper & Cardboard (₹{WASTE_PRICES.paper}/kg)</SelectItem>
-                      <SelectItem value="electronics">Electronics (₹{WASTE_PRICES.electronics}/kg)</SelectItem>
-                      <SelectItem value="glass">Glass (₹{WASTE_PRICES.glass}/kg)</SelectItem>
-                      <SelectItem value="metal">Metal (₹{WASTE_PRICES.metal}/kg)</SelectItem>
-                      <SelectItem value="organic">Organic Waste (₹{WASTE_PRICES.organic}/kg)</SelectItem>
-                      <SelectItem value="other">Other (₹{WASTE_PRICES.other}/kg)</SelectItem>
+                      <SelectItem value="metal">Metal</SelectItem>
+                      <SelectItem value="paper">Paper</SelectItem>
+                      <SelectItem value="plastic">Plastic</SelectItem>
+                      <SelectItem value="electronics">Electronics</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+
+                {wasteType && (
+                  <div className="space-y-2">
+                    <Label htmlFor="waste-subtype">Select Specific Type</Label>
+                    <Select value={wasteSubtype} onValueChange={setWasteSubtype}>
+                      <SelectTrigger id="waste-subtype" className="w-full">
+                        <SelectValue placeholder="Select specific type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(subtypeOptions).map(([key, data]) => (
+                          <SelectItem key={key} value={key}>
+                            {key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')} 
+                            (₹{data.min}{data.min !== data.max ? ` - ₹${data.max}` : ''} per {data.unit})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
@@ -239,17 +326,17 @@ const Upload = () => {
                   )}
                 </div>
 
-                {wasteWeight && wasteWeight >= 10 && wasteType && (
+                {wasteWeight && wasteWeight >= 10 && wasteType && wasteSubtype && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                       <span className="text-green-800 font-medium">Estimated Earnings:</span>
                       <span className="text-green-600 font-bold text-xl flex items-center">
                         <IndianRupee className="h-5 w-5 mr-1" />
-                        {earnings.toFixed(2)}
+                        {earnings.min === earnings.max ? earnings.min.toFixed(2) : `${earnings.min.toFixed(2)} - ${earnings.max.toFixed(2)}`}
                       </span>
                     </div>
                     <p className="text-green-700 text-sm mt-1">
-                      {wasteWeight}kg × ₹{WASTE_PRICES[wasteType as keyof typeof WASTE_PRICES]}/kg
+                      {wasteWeight}kg × ₹{earnings.min === earnings.max ? earnings.min : `${earnings.min} - ${earnings.max}`}/{subtypeOptions[wasteSubtype]?.unit || 'kg'}
                     </p>
                   </div>
                 )}
@@ -258,9 +345,9 @@ const Upload = () => {
                 <Button 
                   type="submit" 
                   className="w-full bg-green-600 hover:bg-green-700"
-                  disabled={isUploading || !wasteWeight || wasteWeight < 10}
+                  disabled={isUploading || !wasteWeight || wasteWeight < 10 || !wasteType || !wasteSubtype}
                 >
-                  {isUploading ? "Uploading..." : (wasteWeight && wasteWeight >= 10) ? "Upload Waste Details" : "Upload Once Weight Requirement Met"}
+                  {isUploading ? "Uploading..." : (wasteWeight && wasteWeight >= 10) ? "Upload Waste Details" : "Upload Once Requirements Met"}
                 </Button>
               </CardFooter>
             </form>
