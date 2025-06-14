@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -9,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { IndianRupee } from "lucide-react";
+import { IndianRupee, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +36,12 @@ interface PickupOrder {
   reward_amount: number;
 }
 
+interface RewardData {
+  cashReward: number;
+  ecoPoints: number;
+  weight: number;
+}
+
 const Account = () => {
   const { toast } = useToast();
   const { user, loading } = useAuth();
@@ -46,6 +51,7 @@ const Account = () => {
   const [editMode, setEditMode] = useState(false);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null);
   const [pickupOrders, setPickupOrders] = useState<PickupOrder[]>([]);
+  const [rewardData, setRewardData] = useState<RewardData | null>(null);
   const [formData, setFormData] = useState({
     full_name: '',
     username: '',
@@ -65,8 +71,26 @@ const Account = () => {
       loadProfile();
       loadLeaderboardData();
       loadPickupOrders();
+      loadRewardData();
     }
   }, [user]);
+
+  const loadRewardData = () => {
+    const storedRewardData = localStorage.getItem('rewardData');
+    if (storedRewardData) {
+      try {
+        const parsedData = JSON.parse(storedRewardData);
+        setRewardData(parsedData);
+      } catch (error) {
+        console.error('Error parsing reward data:', error);
+      }
+    }
+  };
+
+  const clearRewardData = () => {
+    localStorage.removeItem('rewardData');
+    setRewardData(null);
+  };
 
   const loadProfile = async () => {
     if (!user) return;
@@ -274,67 +298,113 @@ const Account = () => {
             </TabsContent>
             
             <TabsContent value="rewards" className="mt-6">
-              <Card className="transition-colors hover:bg-white">
-                <CardHeader>
-                  <CardTitle>Your Rewards</CardTitle>
-                  <CardDescription>Track your earnings and points.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <Card className="transition-colors hover:bg-white">
-                      <CardHeader className="pb-2">
-                        <CardDescription>Total Cash Earned</CardDescription>
-                        <CardTitle className="text-2xl text-green-600 flex items-center">
-                          <IndianRupee size={20} className="mr-1" />
-                          {leaderboardData?.total_cash_earned?.toFixed(2) || '0.00'}
-                        </CardTitle>
-                      </CardHeader>
-                    </Card>
-                    <Card className="transition-colors hover:bg-white">
-                      <CardHeader className="pb-2">
-                        <CardDescription>Eco-Score Points</CardDescription>
-                        <CardTitle className="text-2xl text-green-600">
-                          {leaderboardData?.total_eco_points || 0} pts
-                        </CardTitle>
-                      </CardHeader>
-                    </Card>
-                    <Card className="transition-colors hover:bg-white">
-                      <CardHeader className="pb-2">
-                        <CardDescription>Total Orders</CardDescription>
-                        <CardTitle className="text-2xl text-green-600">
-                          {leaderboardData?.total_orders || 0}
-                        </CardTitle>
-                      </CardHeader>
-                    </Card>
-                  </div>
-                  
-                  <h3 className="text-lg font-medium mb-4">Recent Rewards</h3>
-                  <div className="space-y-4">
-                    {pickupOrders.filter(order => order.status === 'completed').slice(0, 3).map((order, i) => (
-                      <div key={order.id} className="flex justify-between items-center p-4 border rounded-lg transition-colors hover:bg-white">
-                        <div>
-                          <p className="font-medium">
-                            Cash Reward - {order.waste_type} ({order.waste_subtype})
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {new Date(order.created_at).toLocaleDateString()}
+              <div className="space-y-6">
+                {/* Latest Upload Reward */}
+                {rewardData && (
+                  <Card className="transition-colors hover:bg-white border-2 border-green-200 bg-green-50">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-green-700">
+                        <Award className="h-5 w-5" />
+                        Latest Upload Reward
+                      </CardTitle>
+                      <CardDescription>
+                        Your estimated reward from the most recent waste upload
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="text-center p-4 bg-white rounded-lg border">
+                          <div className="text-2xl font-bold text-green-600 flex items-center justify-center">
+                            <IndianRupee size={20} className="mr-1" />
+                            {rewardData.cashReward.toFixed(2)}
+                          </div>
+                          <div className="text-sm text-gray-600 mt-1">Cash Reward</div>
+                        </div>
+                        <div className="text-center p-4 bg-white rounded-lg border">
+                          <div className="text-2xl font-bold text-green-600">
+                            {rewardData.ecoPoints} pts
+                          </div>
+                          <div className="text-sm text-gray-600 mt-1">Eco Points</div>
+                        </div>
+                        <div className="text-center p-4 bg-white rounded-lg border">
+                          <div className="text-2xl font-bold text-green-600">
+                            {rewardData.weight} kg
+                          </div>
+                          <div className="text-sm text-gray-600 mt-1">Waste Weight</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button variant="outline" onClick={clearRewardData} className="w-full">
+                        Clear Latest Reward Data
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                )}
+
+                {/* Overall Rewards */}
+                <Card className="transition-colors hover:bg-white">
+                  <CardHeader>
+                    <CardTitle>Your Total Rewards</CardTitle>
+                    <CardDescription>Track your overall earnings and points.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                      <Card className="transition-colors hover:bg-white">
+                        <CardHeader className="pb-2">
+                          <CardDescription>Total Cash Earned</CardDescription>
+                          <CardTitle className="text-2xl text-green-600 flex items-center">
+                            <IndianRupee size={20} className="mr-1" />
+                            {leaderboardData?.total_cash_earned?.toFixed(2) || '0.00'}
+                          </CardTitle>
+                        </CardHeader>
+                      </Card>
+                      <Card className="transition-colors hover:bg-white">
+                        <CardHeader className="pb-2">
+                          <CardDescription>Eco-Score Points</CardDescription>
+                          <CardTitle className="text-2xl text-green-600">
+                            {leaderboardData?.total_eco_points || 0} pts
+                          </CardTitle>
+                        </CardHeader>
+                      </Card>
+                      <Card className="transition-colors hover:bg-white">
+                        <CardHeader className="pb-2">
+                          <CardDescription>Total Orders</CardDescription>
+                          <CardTitle className="text-2xl text-green-600">
+                            {leaderboardData?.total_orders || 0}
+                          </CardTitle>
+                        </CardHeader>
+                      </Card>
+                    </div>
+                    
+                    <h3 className="text-lg font-medium mb-4">Recent Rewards</h3>
+                    <div className="space-y-4">
+                      {pickupOrders.filter(order => order.status === 'completed').slice(0, 3).map((order, i) => (
+                        <div key={order.id} className="flex justify-between items-center p-4 border rounded-lg transition-colors hover:bg-white">
+                          <div>
+                            <p className="font-medium">
+                              Cash Reward - {order.waste_type} ({order.waste_subtype})
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {new Date(order.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <p className="font-bold text-green-600 flex items-center">
+                            <IndianRupee size={16} className="mr-1" />
+                            {order.reward_amount?.toFixed(2) || '0.00'}
                           </p>
                         </div>
-                        <p className="font-bold text-green-600 flex items-center">
-                          <IndianRupee size={16} className="mr-1" />
-                          {order.reward_amount?.toFixed(2) || '0.00'}
-                        </p>
-                      </div>
-                    ))}
-                    {pickupOrders.filter(order => order.status === 'completed').length === 0 && (
-                      <p className="text-gray-500 text-center py-4">No completed orders yet.</p>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full">View All Rewards</Button>
-                </CardFooter>
-              </Card>
+                      ))}
+                      {pickupOrders.filter(order => order.status === 'completed').length === 0 && (
+                        <p className="text-gray-500 text-center py-4">No completed orders yet.</p>
+                      )}
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full">View All Rewards</Button>
+                  </CardFooter>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
