@@ -41,8 +41,7 @@ const Account = () => {
   const [formData, setFormData] = useState({
     full_name: '',
     username: '',
-    phone_number: '',
-    avatar_url: ''
+    phone_number: ''
   });
 
   // Redirect if not authenticated
@@ -79,8 +78,7 @@ const Account = () => {
         setFormData({
           full_name: data.full_name || '',
           username: data.username || '',
-          phone_number: data.phone_number || '',
-          avatar_url: data.avatar_url || ''
+          phone_number: data.phone_number || ''
         });
       }
     } catch (error) {
@@ -244,16 +242,6 @@ const Account = () => {
                       value={formData.phone_number} 
                       onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} 
                       disabled={!editMode} 
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="avatar-url">Avatar URL</Label>
-                    <Input 
-                      id="avatar-url" 
-                      value={formData.avatar_url} 
-                      onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })} 
-                      disabled={!editMode} 
-                      placeholder="https://example.com/avatar.jpg"
                     />
                   </div>
                 </CardContent>
