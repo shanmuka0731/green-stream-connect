@@ -22,14 +22,14 @@ const Hero = () => {
       </div>
       
       {/* Content */}
-      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 bg-transparent">
-        <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] text-gray-200 md:text-6xl">
-          Join the Green Movement
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32 text-center">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white max-w-3xl mx-auto drop-shadow-lg">
+          Join the <span className="green-metallic-text">Green Movement</span>
         </h1>
-        <p className="text-xl md:text-2xl mb-8 text-gray-200 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
-          Join the green revolution and earn rewards for recycling
+        <p className="mt-6 max-w-2xl mx-auto text-xl text-white drop-shadow-md">
+          Turn your trash into cash while helping save the planet. Connect with waste collection services and get rewarded for your eco-friendly actions.
         </p>
-        <div>
+        <div className="mt-8">
           <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg" asChild>
             <Link to={user ? "/upload" : "/auth"}>
               Get Started
