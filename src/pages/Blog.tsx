@@ -630,7 +630,7 @@ const additionalBlogPosts = [
     date: "March 5, 2025",
     author: "Barbara Gordon",
     category: "Environmental Health",
-    imageUrl: "https://images.unsplash.com/photo-1621451305624-272c586b87de?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://imageio.forbes.com/specials-images/imageserve/67d2003d101fbbe84ce8c3eb/Close-up-side-shot-of-microplastics-lay-on-people-hand-Concept-of-water-pollution-and/960x0.jpg?height=473&width=711&fit=bounds",
     content: `
       <p>As plastic pollution has gained recognition as a global environmental crisis, scientists are increasingly concerned about its smallest components: microplastics. These tiny particles, less than 5mm in size, have infiltrated virtually every environment on Earth with potential consequences that researchers are only beginning to understand.</p>
       
