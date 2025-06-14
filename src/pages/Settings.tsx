@@ -6,13 +6,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+
 const Settings = () => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
   const handleSaveChanges = () => {
     setIsLoading(true);
 
@@ -26,12 +33,52 @@ const Settings = () => {
       });
     }, 1000);
   };
-  return <div className="min-h-screen flex flex-col">
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    
+    setIsDeletingAccount(true);
+    try {
+      // First, delete user data from our custom tables
+      await supabase.from('profiles').delete().eq('id', user.id);
+      await supabase.from('pickup_orders').delete().eq('user_id', user.id);
+      await supabase.from('eco_score_leaderboard').delete().eq('user_id', user.id);
+      
+      // Then delete the auth user (this will cascade to related data)
+      const { error } = await supabase.auth.admin.deleteUser(user.id);
+      
+      if (error) {
+        // If admin delete fails, try regular account deletion
+        const { error: deleteError } = await supabase.auth.signOut();
+        if (deleteError) throw deleteError;
+      }
+
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been permanently deleted."
+      });
+
+      // Redirect to home page after successful deletion
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete account. Please try again or contact support.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       <main style={{
-      backgroundBlendMode: 'overlay',
-      backgroundColor: 'rgba(14, 18, 16, 0.7)'
-    }} className="flex-grow py-10 px-4 lg:px-8 bg-gray-900 rounded-none mx-0 sm:px-[24px]">
+        backgroundBlendMode: 'overlay',
+        backgroundColor: 'rgba(14, 18, 16, 0.7)'
+      }} className="flex-grow py-10 px-4 lg:px-8 bg-gray-900 rounded-none mx-0 sm:px-[24px]">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] mb-6">Settings</h1>
 
@@ -201,7 +248,38 @@ const Settings = () => {
                   <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveChanges} disabled={isLoading}>
                     {isLoading ? "Saving..." : "Save Settings"}
                   </Button>
-                  <Button variant="link" className="text-red-600 p-0">Delete My Account</Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="link" className="text-red-600 p-0" disabled={isDeletingAccount}>
+                        {isDeletingAccount ? "Deleting..." : "Delete My Account"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete your account
+                          and remove all of your data from our servers, including:
+                          <ul className="list-disc list-inside mt-2 space-y-1">
+                            <li>Your profile information</li>
+                            <li>All pickup orders and history</li>
+                            <li>Your eco-score and leaderboard data</li>
+                            <li>All rewards and cash earnings</li>
+                          </ul>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleDeleteAccount}
+                          className="bg-red-600 hover:bg-red-700"
+                          disabled={isDeletingAccount}
+                        >
+                          {isDeletingAccount ? "Deleting..." : "Yes, delete my account"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </CardFooter>
               </Card>
             </TabsContent>
@@ -263,6 +341,8 @@ const Settings = () => {
         </div>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Settings;
