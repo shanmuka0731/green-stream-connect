@@ -1,4 +1,5 @@
 
+
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
@@ -7,7 +8,7 @@ const Hero = () => {
   const { user } = useAuth();
   
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center">
+    <div className="relative overflow-hidden flex justify-center items-center min-h-[100vh]">
       {/* Background Image with Dark Overlay */}
       <div 
         className="absolute inset-0 z-0" 
@@ -37,8 +38,9 @@ const Hero = () => {
           </Button>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
 export default Hero;
+
