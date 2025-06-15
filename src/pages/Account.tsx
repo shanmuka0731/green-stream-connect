@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -201,9 +200,15 @@ const Account = () => {
     return null;
   }
 
-  const userInitials = profile?.full_name 
-    ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase() 
-    : user.email?.charAt(0).toUpperCase() || 'U';
+  // Replace userInitials with emoji avatars
+  const getRandomEmoji = () => {
+    const emojis = ['👤', '🙂', '😊', '🌟', '🎯', '🚀', '💚', '🌱', '♻️', '🌍'];
+    const userId = user.id || '';
+    const index = userId ? userId.charCodeAt(0) % emojis.length : 0;
+    return emojis[index];
+  };
+
+  const userEmoji = getRandomEmoji();
 
   const getRewardIcon = (rewardType: string) => {
     switch (rewardType) {
@@ -272,7 +277,9 @@ const Account = () => {
           <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center space-x-4">
               <Avatar className="h-20 w-20">
-                <AvatarFallback>{userInitials}</AvatarFallback>
+                <AvatarFallback className="text-3xl bg-green-100">
+                  {userEmoji}
+                </AvatarFallback>
               </Avatar>
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
