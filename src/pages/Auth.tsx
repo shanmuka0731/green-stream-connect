@@ -36,8 +36,7 @@ const Auth = () => {
     confirmPassword: '',
     fullName: '',
     username: '',
-    phoneNumber: '',
-    address: ''
+    phoneNumber: ''
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -89,8 +88,7 @@ const Auth = () => {
       const userData = {
         full_name: signupData.fullName,
         username: signupData.username,
-        phone_number: signupData.phoneNumber,
-        address: signupData.address
+        phone_number: signupData.phoneNumber
       };
 
       const { error } = await signUp(signupData.email, signupData.password, userData);
@@ -248,15 +246,6 @@ const Auth = () => {
                         placeholder="+1 234 567 890"
                         value={signupData.phoneNumber}
                         onChange={(e) => setSignupData({...signupData, phoneNumber: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-address">Address</Label>
-                      <Input
-                        id="signup-address"
-                        placeholder="123 Green Street, Eco City"
-                        value={signupData.address}
-                        onChange={(e) => setSignupData({...signupData, address: e.target.value})}
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
