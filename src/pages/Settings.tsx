@@ -1,3 +1,4 @@
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,6 @@ const Settings = () => {
       // First, delete user data from our custom tables
       await supabase.from('profiles').delete().eq('id', user.id);
       await supabase.from('pickup_orders').delete().eq('user_id', user.id);
-      await supabase.from('eco_score_leaderboard').delete().eq('user_id', user.id);
       
       // Then delete the auth user (this will cascade to related data)
       const { error } = await supabase.auth.admin.deleteUser(user.id);
@@ -263,7 +263,6 @@ const Settings = () => {
                           <ul className="list-disc list-inside mt-2 space-y-1">
                             <li>Your profile information</li>
                             <li>All pickup orders and history</li>
-                            <li>Your eco-score and leaderboard data</li>
                             <li>All rewards and cash earnings</li>
                           </ul>
                         </AlertDialogDescription>
