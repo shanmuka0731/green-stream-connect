@@ -15,6 +15,9 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          organization_id: string | null
+          pickup_address: string | null
+          pickup_date: string | null
           reward_amount: number | null
           reward_type: string | null
           status: string
@@ -29,6 +32,9 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          organization_id?: string | null
+          pickup_address?: string | null
+          pickup_date?: string | null
           reward_amount?: number | null
           reward_type?: string | null
           status?: string
@@ -43,6 +49,9 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          organization_id?: string | null
+          pickup_address?: string | null
+          pickup_date?: string | null
           reward_amount?: number | null
           reward_type?: string | null
           status?: string
@@ -52,7 +61,15 @@ export type Database = {
           waste_type?: string
           weight?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pickup_orders_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "register_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

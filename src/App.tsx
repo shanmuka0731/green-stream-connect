@@ -16,6 +16,7 @@ import Pickup from "./pages/Pickup";
 import Reward from "./pages/Reward";
 import Register from "./pages/Register";
 import Auth from "./pages/Auth";
+import OrganizationDashboard from "./pages/OrganizationDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/reward" element={<Reward />} />
             <Route path="/register" element={<Register />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/organization-dashboard" element={<OrganizationDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -31,6 +31,11 @@ const Footer = () => {
               Settings
             </Link>
           </div>
+          <div className="px-5 py-2">
+            <Link to="/organization-dashboard" className="text-base text-gray-500 hover:text-gray-900">
+              Organization Dashboard
+            </Link>
+          </div>
         </nav>
         <p className="mt-8 text-center text-base text-gray-400">
           &copy; 2025 Trash2Cash. All rights reserved.
