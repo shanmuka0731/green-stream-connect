@@ -8,6 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -122,9 +123,16 @@ const Register = () => {
         backgroundColor: 'rgba(14, 18, 16, 0.7)'
       }} className="flex-grow py-12 bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] mb-8">
-            Register Your Organization
-          </h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+              Register Your Organization
+            </h1>
+            <Link to="/organization-dashboard">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Organization Dashboard
+              </Button>
+            </Link>
+          </div>
           
           {/* Registration form */}
           <div className="bg-white p-6 rounded-lg shadow-md mb-12">
