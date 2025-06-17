@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -106,11 +105,13 @@ const OrganizationDashboard = () => {
 
   const handleConfirmPickup = async (orderId: string) => {
     try {
+      // For now, we'll just update the status without setting organization_id
+      // In a real app, you'd get the actual organization ID from authentication
       const { error } = await supabase
         .from('pickup_orders')
         .update({ 
-          status: 'confirmed',
-          organization_id: 'temp-org-id' // In a real app, this would be the logged-in organization's ID
+          status: 'confirmed'
+          // Remove the problematic organization_id line for now
         })
         .eq('id', orderId);
 
