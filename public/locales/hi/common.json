@@ -1,0 +1,59 @@
+
+{
+  "settings": {
+    "title": "सेटिंग्स",
+    "account": "खाता",
+    "notifications": "सूचनाएं",
+    "privacy": "गोपनीयता",
+    "policy": "नीतियां",
+    "language": "भाषा",
+    "currency": "मुद्रा",
+    "currencyDescription": "पुरस्कारों के लिए उपयोग की जाने वाली मुद्रा",
+    "twoFactor": "द्विकारक प्रमाणीकरण",
+    "twoFactorDescription": "सुरक्षा की एक अतिरिक्त परत जोड़ें",
+    "saveChanges": "परिवर्तन सहेजें",
+    "saving": "सहेजा जा रहा है...",
+    "savePreferences": "प्राथमिकताएं सहेजें",
+    "saveSettings": "सेटिंग्स सहेजें",
+    "success": "सफलता",
+    "changesDone": "परिवर्तन सफलतापूर्वक हो गए"
+  },
+  "languages": {
+    "en": "अंग्रेजी",
+    "te": "तेलुगू",
+    "hi": "हिंदी"
+  },
+  "currencies": {
+    "inr": "INR (₹)",
+    "usd": "USD ($)",
+    "eur": "EUR (€)",
+    "gbp": "GBP (£)",
+    "cad": "CAD ($)"
+  },
+  "notifications": {
+    "email": "ईमेल सूचनाएं",
+    "pickup": "पिकअप रिमाइंडर",
+    "pickupDescription": "आगामी पिकअप के बारे में सूचित हों",
+    "reward": "पुरस्कार पुष्टिकरण",
+    "rewardDescription": "जब आप पुरस्कार प्राप्त करते हैं तो सूचित हों",
+    "newsletter": "न्यूज़लेटर",
+    "newsletterDescription": "अपडेट, सुझाव और स्थिरता समाचार प्राप्त करें",
+    "push": "पुश सूचनाएं",
+    "pickupAlerts": "पिकअप अलर्ट",
+    "pickupAlertsDescription": "पिकअप स्थिति के बारे में सूचनाएं प्राप्त करें",
+    "rewardAlerts": "पुरस्कार अलर्ट",
+    "rewardAlertsDescription": "नए पुरस्कारों के बारे में सूचनाएं प्राप्त करें"
+  },
+  "privacy": {
+    "title": "गोपनीयता सेटिंग्स",
+    "description": "अपने डेटा और गोपनीयता विकल्पों को नियंत्रित करें।",
+    "location": "स्थान सेवाएं",
+    "locationDescription": "बेहतर पिकअप सेवा के लिए अपने स्थान तक पहुंच की अनुमति दें",
+    "dataCollection": "डेटा संग्रह",
+    "dataCollectionDescription": "उपयोग डेटा साझा करके हमें बेहतर बनाने में मदद करें",
+    "profileVisibility": "प्रोफ़ाइल दृश्यता",
+    "profileVisibilityDescription": "अपनी प्रोफ़ाइल को अन्य उपयोगकर्ताओं को दिखाएं",
+    "deleteAccount": "मेरा खाता हटाएं",
+    "deleting": "हटाया जा रहा है..."
+  }
+}

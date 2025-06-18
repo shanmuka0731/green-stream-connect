@@ -1,0 +1,59 @@
+
+{
+  "settings": {
+    "title": "సెట్టింగులు",
+    "account": "ఖాతా",
+    "notifications": "నోటిఫికేషన్లు",
+    "privacy": "గోప్యత",
+    "policy": "విధానాలు",
+    "language": "భాష",
+    "currency": "కరెన్సీ",
+    "currencyDescription": "బహుమతుల కోసం ఉపయోగించే కరెన్సీ",
+    "twoFactor": "రెండు-కారకాల ప్రమాణీకరణ",
+    "twoFactorDescription": "అదనపు భద్రత లేయర్ జోడించండి",
+    "saveChanges": "మార్పులను సేవ్ చేయండి",
+    "saving": "సేవ్ చేస్తోంది...",
+    "savePreferences": "ప్రాధాన్యతలను సేవ్ చేయండి",
+    "saveSettings": "సెట్టింగులను సేవ్ చేయండి",
+    "success": "విజయం",
+    "changesDone": "మార్పులు విజయవంతంగా పూర్తయ్యాయి"
+  },
+  "languages": {
+    "en": "ఇంగ్లీష్",
+    "te": "తెలుగు",
+    "hi": "హిందీ"
+  },
+  "currencies": {
+    "inr": "INR (₹)",
+    "usd": "USD ($)",
+    "eur": "EUR (€)",
+    "gbp": "GBP (£)",
+    "cad": "CAD ($)"
+  },
+  "notifications": {
+    "email": "ఇమెయిల్ నోటిఫికేషన్లు",
+    "pickup": "పికప్ రిమైండర్లు",
+    "pickupDescription": "రాబోయే పికప్లు గురించి తెలుసుకోండి",
+    "reward": "బహుమతి నిర్ధారణలు",
+    "rewardDescription": "మీరు బహుమతులు పొందినప్పుడు తెలుసుకోండి",
+    "newsletter": "న్యూస్‌లెటర్",
+    "newsletterDescription": "అప్‌డేట్లు, చిట్కాలు మరియు స్థిరత్వ వార్తలను పొందండి",
+    "push": "పుష్ నోటిఫికేషన్లు",
+    "pickupAlerts": "పికప్ అలర్ట్లు",
+    "pickupAlertsDescription": "పికప్ స్థితి గురించి నోటిఫికేషన్లు పొందండి",
+    "rewardAlerts": "బహుమతి అలర్ట్లు",
+    "rewardAlertsDescription": "కొత్త బహుమతుల గురించి నోటిఫికేషన్లు పొందండి"
+  },
+  "privacy": {
+    "title": "గోప్యత సెట్టింగులు",
+    "description": "మీ డేటా మరియు గోప్యత ఎంపికలను నియంత్రించండి.",
+    "location": "లొకేషన్ సేవలు",
+    "locationDescription": "మెరుగైన పికప్ సేవ కోసం మీ లొకేషన్‌కు యాక్సెస్ అనుమతించండి",
+    "dataCollection": "డేటా సేకరణ",
+    "dataCollectionDescription": "వినియోగ డేటాను భాగస్వామ్యం చేయడం ద్వారా మాకు మెరుగుపరచడంలో సహాయపడండి",
+    "profileVisibility": "ప్రొఫైల్ దృశ్యమానత",
+    "profileVisibilityDescription": "మీ ప్రొఫైల్‌ను ఇతర వినియోగదారులకు కనిపించేలా చేయండి",
+    "deleteAccount": "నా ఖాతాను తొలగించండి",
+    "deleting": "తొలగిస్తోంది..."
+  }
+}

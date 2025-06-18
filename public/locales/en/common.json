@@ -1,0 +1,59 @@
+
+{
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "policy": "Policies",
+    "language": "Language",
+    "currency": "Currency",
+    "currencyDescription": "Currency used for rewards",
+    "twoFactor": "Two-factor authentication",
+    "twoFactorDescription": "Add an extra layer of security",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "savePreferences": "Save Preferences",
+    "saveSettings": "Save Settings",
+    "success": "Success",
+    "changesDone": "Changes done successfully"
+  },
+  "languages": {
+    "en": "English",
+    "te": "Telugu",
+    "hi": "Hindi"
+  },
+  "currencies": {
+    "inr": "INR (₹)",
+    "usd": "USD ($)",
+    "eur": "EUR (€)",
+    "gbp": "GBP (£)",
+    "cad": "CAD ($)"
+  },
+  "notifications": {
+    "email": "Email Notifications",
+    "pickup": "Pickup Reminders",
+    "pickupDescription": "Get notified about upcoming pickups",
+    "reward": "Reward Confirmations",
+    "rewardDescription": "Get notified when you receive rewards",
+    "newsletter": "Newsletter",
+    "newsletterDescription": "Receive updates, tips, and sustainability news",
+    "push": "Push Notifications",
+    "pickupAlerts": "Pickup Alerts",
+    "pickupAlertsDescription": "Get notifications about pickup status",
+    "rewardAlerts": "Reward Alerts",
+    "rewardAlertsDescription": "Get notifications about new rewards"
+  },
+  "privacy": {
+    "title": "Privacy Settings",
+    "description": "Control your data and privacy options.",
+    "location": "Location Services",
+    "locationDescription": "Allow access to your location for better pickup service",
+    "dataCollection": "Data Collection",
+    "dataCollectionDescription": "Help us improve by sharing usage data",
+    "profileVisibility": "Profile Visibility",
+    "profileVisibilityDescription": "Make your profile visible to other users",
+    "deleteAccount": "Delete My Account",
+    "deleting": "Deleting..."
+  }
+}

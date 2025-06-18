@@ -11,12 +11,16 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const Settings = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { currentLanguage, changeLanguage, supportedLanguages } = useLanguage();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
@@ -29,10 +33,18 @@ const Settings = () => {
       setIsLoading(false);
       // Show toast notification
       toast({
-        title: "Success",
-        description: "Changes done successfully"
+        title: t('settings.success'),
+        description: t('settings.changesDone')
       });
     }, 1000);
+  };
+
+  const handleLanguageChange = async (language: string) => {
+    await changeLanguage(language);
+    toast({
+      title: t('settings.success'),
+      description: t('settings.changesDone')
+    });
   };
 
   const handleDeleteAccount = async () => {
@@ -80,63 +92,65 @@ const Settings = () => {
         backgroundColor: 'rgba(14, 18, 16, 0.7)'
       }} className="flex-grow py-10 px-4 lg:px-8 bg-gray-900 rounded-none mx-0 sm:px-[24px]">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] mb-6">Settings</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)] mb-6">
+            {t('settings.title')}
+          </h1>
 
           <Tabs defaultValue="account">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="account">Account</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="privacy">Privacy</TabsTrigger>
-              <TabsTrigger value="policy">Policies</TabsTrigger>
+              <TabsTrigger value="account">{t('settings.account')}</TabsTrigger>
+              <TabsTrigger value="notifications">{t('settings.notifications')}</TabsTrigger>
+              <TabsTrigger value="privacy">{t('settings.privacy')}</TabsTrigger>
+              <TabsTrigger value="policy">{t('settings.policy')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="account" className="mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Account Settings</CardTitle>
+                  <CardTitle>{t('settings.account')} {t('settings.title')}</CardTitle>
                   <CardDescription>Manage your account preferences.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="language" className="text-base">Language</Label>
-                      <Select defaultValue="en">
+                      <Label htmlFor="language" className="text-base">{t('settings.language')}</Label>
+                      <Select value={currentLanguage} onValueChange={handleLanguageChange}>
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder="Select language" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="en">English</SelectItem>
-                          <SelectItem value="es">Spanish</SelectItem>
-                          <SelectItem value="fr">French</SelectItem>
-                          <SelectItem value="de">German</SelectItem>
-                          <SelectItem value="zh">Chinese</SelectItem>
+                          {supportedLanguages.map((lang) => (
+                            <SelectItem key={lang.code} value={lang.code}>
+                              {t(`languages.${lang.code}`)}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="currency" className="text-base">Currency</Label>
-                        <p className="text-sm text-gray-500">Currency used for rewards</p>
+                        <Label htmlFor="currency" className="text-base">{t('settings.currency')}</Label>
+                        <p className="text-sm text-gray-500">{t('settings.currencyDescription')}</p>
                       </div>
                       <Select defaultValue="inr">
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="inr">INR (₹)</SelectItem>
-                          <SelectItem value="usd">USD ($)</SelectItem>
-                          <SelectItem value="eur">EUR (€)</SelectItem>
-                          <SelectItem value="gbp">GBP (£)</SelectItem>
-                          <SelectItem value="cad">CAD ($)</SelectItem>
+                          <SelectItem value="inr">{t('currencies.inr')}</SelectItem>
+                          <SelectItem value="usd">{t('currencies.usd')}</SelectItem>
+                          <SelectItem value="eur">{t('currencies.eur')}</SelectItem>
+                          <SelectItem value="gbp">{t('currencies.gbp')}</SelectItem>
+                          <SelectItem value="cad">{t('currencies.cad')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="two-factor" className="text-base">Two-factor authentication</Label>
-                        <p className="text-sm text-gray-500">Add an extra layer of security</p>
+                        <Label htmlFor="two-factor" className="text-base">{t('settings.twoFactor')}</Label>
+                        <p className="text-sm text-gray-500">{t('settings.twoFactorDescription')}</p>
                       </div>
                       <Switch id="two-factor" />
                     </div>
@@ -144,7 +158,7 @@ const Settings = () => {
                 </CardContent>
                 <CardFooter>
                   <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveChanges} disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save Changes"}
+                    {isLoading ? t('settings.saving') : t('settings.saveChanges')}
                   </Button>
                 </CardFooter>
               </Card>
@@ -157,47 +171,47 @@ const Settings = () => {
                   <CardDescription>Manage how you receive updates.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <h3 className="text-lg font-medium">Email Notifications</h3>
+                  <h3 className="text-lg font-medium">{t('notifications.email')}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="pickup-email" className="text-base">Pickup Reminders</Label>
-                        <p className="text-sm text-gray-500">Get notified about upcoming pickups</p>
+                        <Label htmlFor="pickup-email" className="text-base">{t('notifications.pickup')}</Label>
+                        <p className="text-sm text-gray-500">{t('notifications.pickupDescription')}</p>
                       </div>
                       <Switch id="pickup-email" defaultChecked />
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="reward-email" className="text-base">Reward Confirmations</Label>
-                        <p className="text-sm text-gray-500">Get notified when you receive rewards</p>
+                        <Label htmlFor="reward-email" className="text-base">{t('notifications.reward')}</Label>
+                        <p className="text-sm text-gray-500">{t('notifications.rewardDescription')}</p>
                       </div>
                       <Switch id="reward-email" defaultChecked />
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="newsletter" className="text-base">Newsletter</Label>
-                        <p className="text-sm text-gray-500">Receive updates, tips, and sustainability news</p>
+                        <Label htmlFor="newsletter" className="text-base">{t('notifications.newsletter')}</Label>
+                        <p className="text-sm text-gray-500">{t('notifications.newsletterDescription')}</p>
                       </div>
                       <Switch id="newsletter" />
                     </div>
                   </div>
                   
-                  <h3 className="text-lg font-medium mt-6">Push Notifications</h3>
+                  <h3 className="text-lg font-medium mt-6">{t('notifications.push')}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="pickup-push" className="text-base">Pickup Alerts</Label>
-                        <p className="text-sm text-gray-500">Get notifications about pickup status</p>
+                        <Label htmlFor="pickup-push" className="text-base">{t('notifications.pickupAlerts')}</Label>
+                        <p className="text-sm text-gray-500">{t('notifications.pickupAlertsDescription')}</p>
                       </div>
                       <Switch id="pickup-push" defaultChecked />
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="reward-push" className="text-base">Reward Alerts</Label>
-                        <p className="text-sm text-gray-500">Get notifications about new rewards</p>
+                        <Label htmlFor="reward-push" className="text-base">{t('notifications.rewardAlerts')}</Label>
+                        <p className="text-sm text-gray-500">{t('notifications.rewardAlertsDescription')}</p>
                       </div>
                       <Switch id="reward-push" defaultChecked />
                     </div>
@@ -205,7 +219,7 @@ const Settings = () => {
                 </CardContent>
                 <CardFooter>
                   <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveChanges} disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save Preferences"}
+                    {isLoading ? t('settings.saving') : t('settings.savePreferences')}
                   </Button>
                 </CardFooter>
               </Card>
@@ -214,31 +228,31 @@ const Settings = () => {
             <TabsContent value="privacy" className="mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Privacy Settings</CardTitle>
-                  <CardDescription>Control your data and privacy options.</CardDescription>
+                  <CardTitle>{t('privacy.title')}</CardTitle>
+                  <CardDescription>{t('privacy.description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="location" className="text-base">Location Services</Label>
-                        <p className="text-sm text-gray-500">Allow access to your location for better pickup service</p>
+                        <Label htmlFor="location" className="text-base">{t('privacy.location')}</Label>
+                        <p className="text-sm text-gray-500">{t('privacy.locationDescription')}</p>
                       </div>
                       <Switch id="location" defaultChecked />
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="data-collection" className="text-base">Data Collection</Label>
-                        <p className="text-sm text-gray-500">Help us improve by sharing usage data</p>
+                        <Label htmlFor="data-collection" className="text-base">{t('privacy.dataCollection')}</Label>
+                        <p className="text-sm text-gray-500">{t('privacy.dataCollectionDescription')}</p>
                       </div>
                       <Switch id="data-collection" defaultChecked />
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="profile-visibility" className="text-base">Profile Visibility</Label>
-                        <p className="text-sm text-gray-500">Make your profile visible to other users</p>
+                        <Label htmlFor="profile-visibility" className="text-base">{t('privacy.profileVisibility')}</Label>
+                        <p className="text-sm text-gray-500">{t('privacy.profileVisibilityDescription')}</p>
                       </div>
                       <Switch id="profile-visibility" />
                     </div>
@@ -246,12 +260,12 @@ const Settings = () => {
                 </CardContent>
                 <CardFooter className="flex flex-col items-start space-y-2">
                   <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleSaveChanges} disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save Settings"}
+                    {isLoading ? t('settings.saving') : t('settings.saveSettings')}
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="link" className="text-red-600 p-0" disabled={isDeletingAccount}>
-                        {isDeletingAccount ? "Deleting..." : "Delete My Account"}
+                        {isDeletingAccount ? t('privacy.deleting') : t('privacy.deleteAccount')}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
@@ -274,7 +288,7 @@ const Settings = () => {
                           className="bg-red-600 hover:bg-red-700"
                           disabled={isDeletingAccount}
                         >
-                          {isDeletingAccount ? "Deleting..." : "Yes, delete my account"}
+                          {isDeletingAccount ? t('privacy.deleting') : "Yes, delete my account"}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
