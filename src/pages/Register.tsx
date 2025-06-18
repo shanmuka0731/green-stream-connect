@@ -8,10 +8,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Define form validation schema
 const formSchema = z.object({
@@ -37,8 +38,11 @@ interface RegisteredOrg {
 
 const Register = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [registrations, setRegistrations] = useState<FormValues[]>([]);
   const [registeredOrgs, setRegisteredOrgs] = useState<RegisteredOrg[]>([]);
+  const [userOrganization, setUserOrganization] = useState<RegisteredOrg | null>(null);
   const [pickups] = useState([
     { id: 1, location: "123 Green St", status: "Pending", wasteType: "Plastic" },
     { id: 2, location: "456 Eco Ave", status: "Confirmed", wasteType: "Paper" },
@@ -47,7 +51,10 @@ const Register = () => {
 
   useEffect(() => {
     loadRegisteredOrgs();
-  }, []);
+    if (user) {
+      loadUserOrganization();
+    }
+  }, [user]);
 
   const loadRegisteredOrgs = async () => {
     try {
@@ -67,6 +74,27 @@ const Register = () => {
     }
   };
 
+  const loadUserOrganization = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('register_organizations')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading user organization:', error);
+        return;
+      }
+
+      setUserOrganization(data);
+    } catch (error) {
+      console.error('Error loading user organization:', error);
+    }
+  };
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -80,6 +108,15 @@ const Register = () => {
   });
 
   const onSubmit = async (data: FormValues) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to register an organization",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('register_organizations')
@@ -89,7 +126,8 @@ const Register = () => {
           phone: data.phone,
           address: data.address,
           description: data.description,
-          waste_types: data.wasteTypes
+          waste_types: data.wasteTypes,
+          user_id: user.id
         });
 
       if (error) throw error;
@@ -97,14 +135,20 @@ const Register = () => {
       // Update local state for immediate UI feedback
       setRegistrations([...registrations, data]);
       
-      // Reload registered organizations
+      // Reload registered organizations and user organization
       await loadRegisteredOrgs();
+      await loadUserOrganization();
       
       toast({
         title: "Success",
         description: "Your organization has been registered successfully"
       });
       form.reset();
+
+      // Navigate to organization dashboard after successful registration
+      setTimeout(() => {
+        navigate('/organization-dashboard');
+      }, 1500);
     } catch (error) {
       console.error('Error registering organization:', error);
       toast({
@@ -114,6 +158,35 @@ const Register = () => {
       });
     }
   };
+
+  // If user has an organization, show a message and redirect option
+  if (user && userOrganization) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow py-12 bg-gray-900">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white p-8 rounded-lg shadow-md text-center">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                Organization Already Registered
+              </h1>
+              <p className="text-gray-600 mb-4">
+                You have already registered the organization: <strong>{userOrganization.organization_name}</strong>
+              </p>
+              <div className="space-y-4">
+                <Link to="/organization-dashboard">
+                  <Button className="bg-green-600 hover:bg-green-700">
+                    Go to Organization Dashboard
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -133,6 +206,13 @@ const Register = () => {
               </Button>
             </Link>
           </div>
+
+          {!user && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
+              <p className="font-medium">Authentication Required</p>
+              <p>Please <Link to="/auth" className="underline">log in</Link> to register your organization.</p>
+            </div>
+          )}
           
           {/* Registration form */}
           <div className="bg-white p-6 rounded-lg shadow-md mb-12">
@@ -228,7 +308,11 @@ const Register = () => {
                   )}
                 />
                 
-                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
+                <Button 
+                  type="submit" 
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  disabled={!user}
+                >
                   Register Organization
                 </Button>
               </form>

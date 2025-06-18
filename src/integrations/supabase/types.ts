@@ -110,6 +110,7 @@ export type Database = {
           id: string
           organization_name: string
           phone: string
+          user_id: string | null
           waste_types: string
         }
         Insert: {
@@ -120,6 +121,7 @@ export type Database = {
           id?: string
           organization_name: string
           phone: string
+          user_id?: string | null
           waste_types: string
         }
         Update: {
@@ -130,6 +132,7 @@ export type Database = {
           id?: string
           organization_name?: string
           phone?: string
+          user_id?: string | null
           waste_types?: string
         }
         Relationships: []

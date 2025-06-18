@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { CalendarDays, MapPin, User, Trash2 } from "lucide-react";
+import { CalendarDays, MapPin, User, Trash2, Building2, Mail, Phone, MapPinIcon } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 interface PickupOrder {
   id: string;
@@ -32,36 +35,75 @@ interface UserProfile {
   phone_number: string | null;
 }
 
+interface Organization {
+  id: string;
+  organization_name: string;
+  email: string;
+  phone: string;
+  address: string;
+  description: string;
+  waste_types: string;
+  created_at: string;
+}
+
 const OrganizationDashboard = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [pickupOrders, setPickupOrders] = useState<PickupOrder[]>([]);
   const [userProfiles, setUserProfiles] = useState<Record<string, UserProfile>>({});
+  const [organization, setOrganization] = useState<Organization | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadPickupOrders();
-    loadUserProfiles();
-    
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('pickup-orders-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'pickup_orders'
-        },
-        () => {
-          loadPickupOrders();
-        }
-      )
-      .subscribe();
+    if (user) {
+      loadOrganization();
+      loadPickupOrders();
+      loadUserProfiles();
+      
+      // Set up real-time subscription
+      const channel = supabase
+        .channel('pickup-orders-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'pickup_orders'
+          },
+          () => {
+            loadPickupOrders();
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const loadOrganization = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('register_organizations')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading organization:', error);
+        return;
+      }
+
+      setOrganization(data);
+    } catch (error) {
+      console.error('Error loading organization:', error);
+    }
+  };
 
   const loadPickupOrders = async () => {
     try {
@@ -104,14 +146,21 @@ const OrganizationDashboard = () => {
   };
 
   const handleConfirmPickup = async (orderId: string) => {
+    if (!organization) {
+      toast({
+        title: "Error",
+        description: "No organization found. Please register your organization first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      // For now, we'll just update the status without setting organization_id
-      // In a real app, you'd get the actual organization ID from authentication
       const { error } = await supabase
         .from('pickup_orders')
         .update({ 
-          status: 'confirmed'
-          // Remove the problematic organization_id line for now
+          status: 'confirmed',
+          organization_id: organization.id
         })
         .eq('id', orderId);
 
@@ -164,6 +213,26 @@ const OrganizationDashboard = () => {
     }
   };
 
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h2>
+            <p className="text-gray-600 mb-4">Please log in to access the organization dashboard.</p>
+            <Link to="/auth">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Log In
+              </Button>
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -171,7 +240,28 @@ const OrganizationDashboard = () => {
         <main className="flex-grow flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading pickup orders...</p>
+            <p className="mt-4 text-gray-600">Loading organization dashboard...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!organization) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <Building2 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">No Organization Found</h2>
+            <p className="text-gray-600 mb-4">You need to register your organization first to access this dashboard.</p>
+            <Link to="/register">
+              <Button className="bg-green-600 hover:bg-green-700">
+                Register Organization
+              </Button>
+            </Link>
           </div>
         </main>
         <Footer />
@@ -189,7 +279,62 @@ const OrganizationDashboard = () => {
             <p className="text-gray-600">Manage pickup orders from users in your area</p>
           </div>
 
+          {/* Organization Profile Card */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Building2 className="h-5 w-5" />
+                <span>Organization Profile</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">{organization.organization_name}</h3>
+                    <p className="text-gray-600 mt-2">{organization.description}</p>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Mail className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-600">{organization.email}</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Phone className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-600">{organization.phone}</span>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <MapPinIcon className="h-4 w-4 text-gray-500 mt-0.5" />
+                    <span className="text-gray-600">{organization.address}</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Waste Types Collected:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {organization.waste_types.split(',').map((type, index) => (
+                      <Badge key={index} variant="secondary">
+                        {type.trim()}
+                      </Badge>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-500">
+                      Registered on {new Date(organization.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pickup Orders Section */}
           <div className="grid gap-6">
+            <h2 className="text-2xl font-bold text-gray-900">Pickup Orders</h2>
+            
             {pickupOrders.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
