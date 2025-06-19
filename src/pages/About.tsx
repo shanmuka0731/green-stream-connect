@@ -9,43 +9,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const About = () => {
   const creators = [
     {
-      name: "Sarah Johnson",
-      role: "Environmental Scientist",
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop&crop=face"
+      name: "S.Shanmuka Priya",
+      role: "Team Lead",
+      image: "Public/lovable-uploads/shan.jpg"
     },
     {
-      name: "Mike Chen",
-      role: "Sustainability Expert",
-      image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=400&h=400&fit=crop&crop=face"
+      name: "Ch.Sadhvi",
+      role: "Resource Manager",
+      image: "Public/lovable-uploads/sadhvi.jpg"
     },
     {
-      name: "Emma Rodriguez",
+      name: "M.Sujana Sri",
       role: "Community Outreach Lead",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=400&fit=crop&crop=face"
+      image:"Public/lovable-uploads/sujan.jpg"
     },
     {
-      name: "David Thompson",
-      role: "Technology Director",
-      image: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&h=400&fit=crop&crop=face"
+      name: "R.Chandhrika"",
+      role: "Service Manager",
+     image:"Public/lovable-uploads/chand.jpg"
     }
   ];
 
   const surveyData = [
+  {
+      title: "Community Survey",
+      image:"Public/lovable-uploads/picture3.jpg",
+      description:"A survey on Trash2Cash helps understand public awareness, attitudes, and participation in waste recycling initiatives. It collects data on how people manage their waste and their willingness to exchange recyclables for rewards, guiding improvements in the program."
+    },
     {
       title: "Waste Reduction Impact",
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop",
+      image:"Public/lovable-uploads/picture2.jpg",
       description: "Our community survey revealed that 89% of participants reduced their household waste by at least 30% after joining Trash2Cash. The most significant improvements were seen in plastic waste reduction and proper recycling practices."
     },
     {
       title: "Community Engagement",
-      image: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&h=400&fit=crop",
+      image:"Public/lovable-uploads/picture.jpg",
       description: "95% of survey respondents reported feeling more connected to their local environmental community. Regular pickup events have created lasting friendships and collaborative initiatives beyond waste management."
     },
-    {
-      title: "Economic Benefits",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&h=400&fit=crop",
-      description: "Participants have earned an average of $150 per month through our rewards program. 78% of users reinvest their earnings into more sustainable lifestyle choices, creating a positive feedback loop for environmental impact."
-    }
+
   ];
 
   return (
