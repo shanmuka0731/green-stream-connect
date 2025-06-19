@@ -24,7 +24,7 @@ const About = () => {
       image:"Public/lovable-uploads/sujan.jpg"
     },
     {
-      name: "R.Chandhrika"",
+      name: "R.Chandhrika",
       role: "Service Manager",
      image:"Public/lovable-uploads/chand.jpg"
     }
