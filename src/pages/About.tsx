@@ -11,42 +11,41 @@ const About = () => {
     {
       name: "S.Shanmuka Priya",
       role: "Team Lead",
-      image: "Public/lovable-uploads/shan.jpg"
+      image: "/lovable-uploads/7b530e4d-8f57-4ed0-9526-456e825d2d16.png"
     },
     {
       name: "Ch.Sadhvi",
       role: "Resource Manager",
-      image: "Public/lovable-uploads/sadhvi.jpg"
+      image: "/lovable-uploads/b9a63ebf-7cbb-4e7a-87fb-31dc460162bb.png"
     },
     {
       name: "M.Sujana Sri",
       role: "Community Outreach Lead",
-      image:"Public/lovable-uploads/sujan.jpg"
+      image: "/lovable-uploads/60ca50a5-1e5f-4a61-9daf-060d70dcb6ca.png"
     },
     {
       name: "R.Chandhrika",
       role: "Service Manager",
-     image:"Public/lovable-uploads/chand.jpg"
+      image: "/lovable-uploads/34c1f67e-382a-4b16-97d3-970fd5cbb497.png"
     }
   ];
 
   const surveyData = [
-  {
+    {
       title: "Community Survey",
-      image:"Public/lovable-uploads/picture3.jpg",
-      description:"A survey on Trash2Cash helps understand public awareness, attitudes, and participation in waste recycling initiatives. It collects data on how people manage their waste and their willingness to exchange recyclables for rewards, guiding improvements in the program."
+      image: "/lovable-uploads/picture3.jpg",
+      description: "A survey on Trash2Cash helps understand public awareness, attitudes, and participation in waste recycling initiatives. It collects data on how people manage their waste and their willingness to exchange recyclables for rewards, guiding improvements in the program."
     },
     {
       title: "Waste Reduction Impact",
-      image:"Public/lovable-uploads/picture2.jpg",
+      image: "/lovable-uploads/picture2.jpg",
       description: "Our community survey revealed that 89% of participants reduced their household waste by at least 30% after joining Trash2Cash. The most significant improvements were seen in plastic waste reduction and proper recycling practices."
     },
     {
       title: "Community Engagement",
-      image:"Public/lovable-uploads/picture.jpg",
+      image: "/lovable-uploads/picture.jpg",
       description: "95% of survey respondents reported feeling more connected to their local environmental community. Regular pickup events have created lasting friendships and collaborative initiatives beyond waste management."
-    },
-
+    }
   ];
 
   return (
@@ -117,7 +116,7 @@ const About = () => {
               {creators.map((creator, index) => (
                 <Card key={index} className="text-center">
                   <CardHeader className="pb-4">
-                    <Avatar className="w-20 h-20 mx-auto mb-4">
+                    <Avatar className="w-24 h-24 mx-auto mb-4">
                       <AvatarImage src={creator.image} alt={creator.name} />
                       <AvatarFallback>{creator.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                     </Avatar>
