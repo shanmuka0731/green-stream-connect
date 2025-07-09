@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -312,16 +313,19 @@ const Upload = () => {
   const subtypeOptions = wasteType ? WASTE_SUBTYPES[wasteType] : {};
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ 
-      backgroundBlendMode: "overlay", 
-      backgroundColor: "rgba(14, 18, 16, 0.7)" 
+    <div className="min-h-screen flex flex-col" style={{  
+       backgroundImage: `url('/lovable-uploads/68a0adf4-1525-41c6-9dc2-0ab8835f4005.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundBlendMode: 'overlay',
+          backgroundColor: 'rgba(14, 18, 16, 0.7)'
     }}>
       <Navbar />
-      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-200 via-gray-400 to-gray-600 text-transparent bg-clip-text drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">Upload Waste Details</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-5xl font-bold text-white mb-4">Upload Waste Details</h1>
+            <p className="mt-2 text-white">
               Tell us about the waste you want to recycle
             </p>
           </div>
