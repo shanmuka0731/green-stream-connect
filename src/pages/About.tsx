@@ -1,3 +1,4 @@
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -146,7 +147,7 @@ const About = () => {
                         <img 
                           src={survey.image} 
                           alt={survey.title}
-                          className="w-full h-64 object-cover rounded-lg mb-4"
+                          className="w-65 h-50 object-cover rounded-lg mb-4"
                         />
                         <p className="text-gray-700 leading-relaxed">{survey.description}</p>
                       </div>

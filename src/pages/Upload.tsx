@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -9,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Weight, AlertTriangle, IndianRupee } from "lucide-react";
+import { Weight, AlertTriangle, IndianRupee, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -86,6 +85,106 @@ const Upload = () => {
       };
       
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCameraCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } // Use back camera if available
+      });
+      
+      // Create video element
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.play();
+      
+      // Create canvas for capturing the photo
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      
+      // Wait for video to load
+      video.onloadedmetadata = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Create a simple camera interface
+        const cameraDiv = document.createElement('div');
+        cameraDiv.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: black;
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        `;
+        
+        video.style.cssText = `
+          max-width: 90%;
+          max-height: 70%;
+          object-fit: contain;
+        `;
+        
+        const captureBtn = document.createElement('button');
+        captureBtn.textContent = 'Capture Photo';
+        captureBtn.style.cssText = `
+          background: #16a34a;
+          color: white;
+          padding: 12px 24px;
+          margin: 10px;
+          border: none;
+          border-radius: 6px;
+          font-size: 16px;
+          cursor: pointer;
+        `;
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.style.cssText = `
+          background: #dc2626;
+          color: white;
+          padding: 12px 24px;
+          margin: 10px;
+          border: none;
+          border-radius: 6px;
+          font-size: 16px;
+          cursor: pointer;
+        `;
+        
+        cameraDiv.appendChild(video);
+        const buttonDiv = document.createElement('div');
+        buttonDiv.appendChild(captureBtn);
+        buttonDiv.appendChild(cancelBtn);
+        cameraDiv.appendChild(buttonDiv);
+        document.body.appendChild(cameraDiv);
+        
+        captureBtn.onclick = () => {
+          context?.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+          setImage(dataURL);
+          
+          // Cleanup
+          stream.getTracks().forEach(track => track.stop());
+          document.body.removeChild(cameraDiv);
+        };
+        
+        cancelBtn.onclick = () => {
+          stream.getTracks().forEach(track => track.stop());
+          document.body.removeChild(cameraDiv);
+        };
+      };
+    } catch (error) {
+      console.error('Camera access error:', error);
+      toast({
+        title: "Camera Error",
+        description: "Unable to access camera. Please use file upload instead.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -296,20 +395,33 @@ const Upload = () => {
                       <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                       </svg>
-                      <div className="mt-4 flex text-sm text-gray-600">
-                        <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
-                          <span>Upload a photo</span>
-                          <input 
-                            id="file-upload" 
-                            name="file-upload" 
-                            type="file" 
-                            className="sr-only" 
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            accept="image/*"
-                          />
-                        </label>
-                        <p className="pl-1">of your waste</p>
+                      <div className="mt-4 flex flex-col gap-3">
+                        <div className="flex text-sm text-gray-600 justify-center">
+                          <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
+                            <span>Upload a photo</span>
+                            <input 
+                              id="file-upload" 
+                              name="file-upload" 
+                              type="file" 
+                              className="sr-only" 
+                              ref={fileInputRef}
+                              onChange={handleFileChange}
+                              accept="image/*"
+                            />
+                          </label>
+                          <p className="pl-1">of your waste</p>
+                        </div>
+                        <div className="text-center">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleCameraCapture}
+                            className="text-green-600 border-green-600 hover:bg-green-50"
+                          >
+                            <Camera className="h-4 w-4 mr-2" />
+                            Take Photo with Camera
+                          </Button>
+                        </div>
                       </div>
                       <p className="text-xs text-gray-500 mt-2">
                         PNG, JPG, GIF up to 10MB
@@ -321,7 +433,7 @@ const Upload = () => {
                         <img src={image} alt="Waste preview" className="w-full h-auto" />
                       </div>
                       
-                      <div className="mt-4">
+                      <div className="mt-4 flex gap-2 justify-center">
                         <Button
                           type="button"
                           variant="outline"
@@ -333,7 +445,16 @@ const Upload = () => {
                             }
                           }}
                         >
-                          Remove photo & upload another
+                          Remove photo
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleCameraCapture}
+                          className="text-sm text-green-600 border-green-600 hover:bg-green-50"
+                        >
+                          <Camera className="h-4 w-4 mr-2" />
+                          Retake Photo
                         </Button>
                       </div>
                     </div>
