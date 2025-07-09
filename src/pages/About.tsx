@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -11,22 +10,22 @@ const About = () => {
     {
       name: "S.Shanmuka Priya",
       role: "Team Lead",
-      image: "/lovable-uploads/7b530e4d-8f57-4ed0-9526-456e825d2d16.png"
+      image: "/lovable-uploads/shan.jpg"
     },
     {
       name: "Ch.Sadhvi",
-      role: "Resource Manager",
-      image: "/lovable-uploads/b9a63ebf-7cbb-4e7a-87fb-31dc460162bb.png"
+      role: "Resource Manager", 
+      image: "/lovable-uploads/sadhvi.jpg"
     },
     {
       name: "M.Sujana Sri",
       role: "Community Outreach Lead",
-      image: "/lovable-uploads/60ca50a5-1e5f-4a61-9daf-060d70dcb6ca.png"
+      image: "/lovable-uploads/sujan.jpg"
     },
     {
       name: "R.Chandhrika",
       role: "Service Manager",
-      image: "/lovable-uploads/34c1f67e-382a-4b16-97d3-970fd5cbb497.png"
+      image: "/lovable-uploads/chand.jpg"
     }
   ];
 
@@ -38,7 +37,7 @@ const About = () => {
     },
     {
       title: "Waste Reduction Impact",
-      image: "/lovable-uploads/picture2.jpg",
+      image: "/lovable-uploads/picture2.jpg", 
       description: "Our community survey revealed that 89% of participants reduced their household waste by at least 30% after joining Trash2Cash. The most significant improvements were seen in plastic waste reduction and proper recycling practices."
     },
     {
@@ -116,9 +115,9 @@ const About = () => {
               {creators.map((creator, index) => (
                 <Card key={index} className="text-center">
                   <CardHeader className="pb-4">
-                    <Avatar className="w-24 h-24 mx-auto mb-4">
-                      <AvatarImage src={creator.image} alt={creator.name} />
-                      <AvatarFallback>{creator.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    <Avatar className="w-32 h-32 mx-auto mb-4">
+                      <AvatarImage src={creator.image} alt={creator.name} className="object-cover" />
+                      <AvatarFallback className="text-xl">{creator.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                     </Avatar>
                     <CardTitle className="text-lg">{creator.name}</CardTitle>
                   </CardHeader>
@@ -147,7 +146,7 @@ const About = () => {
                         <img 
                           src={survey.image} 
                           alt={survey.title}
-                          className="w-full h-48 object-cover rounded-lg mb-4"
+                          className="w-full h-64 object-cover rounded-lg mb-4"
                         />
                         <p className="text-gray-700 leading-relaxed">{survey.description}</p>
                       </div>
