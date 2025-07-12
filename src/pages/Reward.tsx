@@ -73,11 +73,14 @@ const Reward = () => {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ 
-      backgroundBlendMode: "overlay", 
+      backgroundImage: `url('/lovable-uploads/5512866f-fcf9-4c93-9c83-5c8f75a252d8.png')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      //backgroundBlendMode: "overlay", 
       backgroundColor: "rgba(14, 18, 16, 0.7)" 
     }}>
       <Navbar />
-      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-8">
             <div className="bg-green-100 rounded-lg p-6 text-center">
@@ -92,8 +95,8 @@ const Reward = () => {
           </div>
 
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Select Your Reward</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-4xl font-bold text-white">Select Your Reward</h1>
+            <p className="mt-2 text-white">
               Choose how you'd like to be rewarded for your contribution
             </p>
           </div>
