@@ -48,15 +48,18 @@ const Pickup = () => {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ 
+      backgroundImage: `url('/lovable-uploads/48ee0629-8763-44e6-9864-e0f9d62932bb.png')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       backgroundBlendMode: "overlay", 
       backgroundColor: "rgba(14, 18, 16, 0.7)" 
     }}>
       <Navbar />
-      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Schedule Pickup</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-5xl font-bold text-white">Schedule Pickup</h1>
+            <p className="mt-2 text-white">
               Let us know when and where to collect your waste
             </p>
           </div>
